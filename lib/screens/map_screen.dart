@@ -73,7 +73,7 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Карта'),
+        title: Text('Карта'),
         actions: [
           // Кнопка переключения между картой и списком
           IconButton(

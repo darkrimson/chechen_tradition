@@ -1,5 +1,7 @@
 import 'package:chechen_tradition/screens/home_screen.dart';
 import 'package:chechen_tradition/screens/map_screen.dart';
+import 'package:chechen_tradition/screens/traditions_screen.dart';
+import 'package:chechen_tradition/screens/education_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:yandex_maps_mapkit/init.dart' as init;
 
@@ -45,8 +47,8 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const MapScreen(),
-    // const TraditionsScreen(),
-    // const EducationScreen(),
+    const TraditionsScreen(),
+    const EducationScreen(),
   ];
 
   void _onItemTapped(int index) {
