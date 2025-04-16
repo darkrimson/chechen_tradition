@@ -1,8 +1,8 @@
-import 'package:chechen_tradition/screens/content_detail_screen.dart';
+import 'package:chechen_tradition/features/education/screens/content_detail_screen.dart';
 import 'package:flutter/material.dart';
-import '../models/education.dart';
+import '../../../models/education.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:chechen_tradition/screens/test_screen.dart';
+import 'package:chechen_tradition/features/education/screens/test_screen.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({Key? key}) : super(key: key);

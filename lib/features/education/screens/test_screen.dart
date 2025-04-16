@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/education.dart';
+import '../../../models/education.dart';
 
 class TestScreen extends StatefulWidget {
   final EducationalContent content;

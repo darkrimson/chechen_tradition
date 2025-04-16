@@ -1,7 +1,7 @@
-import 'package:chechen_tradition/screens/test_screen.dart';
+import 'package:chechen_tradition/features/education/screens/test_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import '../models/education.dart';
+import '../../../models/education.dart';
 
 class ContentDetailScreen extends StatefulWidget {
   final EducationalContent content;

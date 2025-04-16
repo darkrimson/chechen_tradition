@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/tradition.dart';
+import '../../../models/tradition.dart';
 
 class TraditionDetailScreen extends StatelessWidget {
   final Tradition tradition;
@@ -18,19 +18,6 @@ class TraditionDetailScreen extends StatelessWidget {
             expandedHeight: 300,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                tradition.title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(
-                      offset: Offset(0, 1),
-                      blurRadius: 3.0,
-                      color: Color.fromARGB(255, 0, 0, 0),
-                    ),
-                  ],
-                ),
-              ),
               background: Hero(
                 tag: 'tradition-${tradition.id}',
                 child: Image.asset(
@@ -47,6 +34,17 @@ class TraditionDetailScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
+                    tradition.title,
+                    style: const TextStyle(
+                      fontSize: 26,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 18,
+                  ),
+                  Text(
                     tradition.content,
                     style: const TextStyle(
                       fontSize: 16,
@@ -54,26 +52,6 @@ class TraditionDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Навигация к тесту
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B0000),
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text(
-                      'Проверить знания',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),

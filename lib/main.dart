@@ -1,7 +1,7 @@
-import 'package:chechen_tradition/screens/home_screen.dart';
-import 'package:chechen_tradition/screens/map_screen.dart';
-import 'package:chechen_tradition/screens/traditions_screen.dart';
-import 'package:chechen_tradition/screens/education_screen.dart';
+import 'package:chechen_tradition/features/home/screen/home_screen.dart';
+import 'package:chechen_tradition/features/map_and_places/screens/places_list_screen.dart';
+import 'package:chechen_tradition/features/traditions/screens/traditions_screen.dart';
+import 'package:chechen_tradition/features/education/screens/education_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:yandex_maps_mapkit/init.dart' as init;
 
@@ -46,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const MapScreen(),
+    const PlacesListScreen(),
     const TraditionsScreen(),
     const EducationScreen(),
   ];
