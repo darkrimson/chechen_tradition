@@ -1,5 +1,5 @@
 import 'package:chechen_tradition/data/places/mock_places.dart';
-import 'package:chechen_tradition/models/culture_place.dart';
+import 'package:chechen_tradition/features/map_and_places/models/culture_place.dart';
 
 class PlacesRepository {
   final List<CulturalPlace> _places = mockPlaces;

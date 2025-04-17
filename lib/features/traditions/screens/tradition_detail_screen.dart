@@ -1,63 +1,254 @@
 import 'package:flutter/material.dart';
-import '../../../models/tradition.dart';
+import 'package:chechen_tradition/features/traditions/models/tradition.dart';
 
 class TraditionDetailScreen extends StatelessWidget {
   final Tradition tradition;
 
-  const TraditionDetailScreen({
-    Key? key,
-    required this.tradition,
-  }) : super(key: key);
+  const TraditionDetailScreen({Key? key, required this.tradition})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
+          // Заголовок с изображением
           SliverAppBar(
-            expandedHeight: 300,
+            expandedHeight: 240.0,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              background: Hero(
-                tag: 'tradition-${tradition.id}',
-                child: Image.asset(
-                  tradition.imageUrl,
-                  fit: BoxFit.cover,
+              title: Text(
+                tradition.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 4.0,
+                      color: Colors.black54,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
                 ),
+              ),
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    tradition.imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey.shade300,
+                        child: Icon(
+                          tradition.category.iconPath,
+                          size: 80,
+                          color: Colors.grey.shade700,
+                        ),
+                      );
+                    },
+                  ),
+                  // Затемнение для лучшей читаемости
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.7),
+                        ],
+                        stops: const [0.7, 1.0],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
+
+          // Метка категории
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Row(
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: _getCategoryColor(tradition.category)
+                          .withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          tradition.category.iconPath,
+                          size: 16,
+                          color: _getCategoryColor(tradition.category),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          tradition.category.label,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: _getCategoryColor(tradition.category),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: Icon(
+                      tradition.isLiked
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: tradition.isLiked ? Colors.red : null,
+                    ),
+                    onPressed: () {
+                      // Логика для добавления в избранное
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            tradition.isLiked
+                                ? 'Удалено из избранного'
+                                : 'Добавлено в избранное',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.share),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Поделиться'),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Описание
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Описание
                   Text(
-                    tradition.title,
+                    tradition.description,
                     style: const TextStyle(
-                      fontSize: 26,
-                      color: Colors.black,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(
-                    height: 18,
-                  ),
+                  const SizedBox(height: 16),
                   Text(
                     tradition.content,
                     style: const TextStyle(
                       fontSize: 16,
-                      height: 1.6,
+                      height: 1.5,
                     ),
                   ),
                   const SizedBox(height: 24),
+
+                  // Заголовок рекомендаций
+                  const Text(
+                    'Похожие традиции',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
+
+          // Похожие традиции
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 220,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                scrollDirection: Axis.horizontal,
+                itemCount: 3, // Показываем до 3 похожих традиций
+                itemBuilder: (context, index) {
+                  return Container(
+                    width: 160,
+                    margin: const EdgeInsets.only(right: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            height: 120,
+                            color: Colors.grey.shade300,
+                            child: Center(
+                              child: Icon(
+                                tradition.category.iconPath,
+                                size: 40,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Похожая традиция ${index + 1}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Краткое описание традиции',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade700,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+
+          // Пространство внизу страницы
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 32),
+          ),
         ],
       ),
     );
+  }
+
+  Color _getCategoryColor(TraditionCategory category) {
+    switch (category) {
+      case TraditionCategory.clothing:
+        return Colors.blue;
+      case TraditionCategory.cuisine:
+        return Colors.orange;
+      case TraditionCategory.crafts:
+        return Colors.amber.shade800;
+      case TraditionCategory.holidays:
+        return Colors.green;
+    }
   }
 }

@@ -1,9 +1,10 @@
-import 'package:chechen_tradition/models/culture_place.dart';
+import 'package:chechen_tradition/features/map_and_places/models/culture_place.dart';
 import 'package:flutter/material.dart';
 import 'package:yandex_maps_mapkit/mapkit.dart';
 import 'package:yandex_maps_mapkit/mapkit_factory.dart';
 // ignore: implementation_imports
 import 'package:yandex_maps_mapkit/src/bindings/image/image_provider.dart'
+    // ignore: library_prefixes
     as yandexImage;
 import 'package:yandex_maps_mapkit/yandex_map.dart';
 

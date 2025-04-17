@@ -1,4 +1,4 @@
-import 'package:chechen_tradition/models/culture_place.dart';
+import 'package:chechen_tradition/features/map_and_places/models/culture_place.dart';
 import 'package:yandex_maps_mapkit/mapkit.dart';
 
 final List<CulturalPlace> mockPlaces = [

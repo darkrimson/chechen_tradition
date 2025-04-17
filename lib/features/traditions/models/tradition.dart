@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Tradition {
   final String id;
   final String title;
@@ -19,12 +21,12 @@ class Tradition {
 }
 
 enum TraditionCategory {
-  clothing('Одежда', 'assets/icons/clothing.png'),
-  cuisine('Кухня', 'assets/icons/cuisine.png'),
-  crafts('Ремесла', 'assets/icons/crafts.png'),
-  holidays('Праздники', 'assets/icons/holidays.png');
+  clothing('Одежда', Icons.person),
+  cuisine('Кухня', Icons.restaurant),
+  crafts('Ремесла', Icons.handshake),
+  holidays('Праздники', Icons.holiday_village);
 
   final String label;
-  final String iconPath;
+  final IconData iconPath;
   const TraditionCategory(this.label, this.iconPath);
 }
