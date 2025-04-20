@@ -7,6 +7,7 @@ class CulturalPlace {
   final Point location;
   final PlaceType type;
   final String? imageUrl;
+  final List<String>? images;
 
   CulturalPlace({
     required this.name,
@@ -14,6 +15,7 @@ class CulturalPlace {
     required this.location,
     required this.type,
     this.imageUrl,
+    this.images,
   });
 }
 
@@ -28,15 +30,15 @@ enum PlaceType {
   const PlaceType(this.label, this.icon);
 }
 
-IconData getIconForType(PlaceType type) {
-  switch (type) {
+Color getCategoryColor(PlaceType category) {
+  switch (category) {
     case PlaceType.museum:
-      return Icons.museum;
+      return Colors.blue;
     case PlaceType.monument:
-      return Icons.account_balance;
+      return Colors.orange;
     case PlaceType.nature:
-      return Icons.landscape;
+      return Colors.amber.shade800;
     case PlaceType.architecture:
-      return Icons.architecture;
+      return Colors.green;
   }
 }

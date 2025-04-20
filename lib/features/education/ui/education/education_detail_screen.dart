@@ -1,19 +1,22 @@
-import 'package:chechen_tradition/features/map_and_places/models/culture_place.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import '../map/map_screen.dart';
+import '../../models/education.dart';
+import 'package:chechen_tradition/features/education/ui/test/test_screen.dart';
 
-class PlaceDetailScreen extends StatefulWidget {
-  final CulturalPlace place;
+class ContentDetailScreen extends StatefulWidget {
+  final EducationalContent content;
 
-  const PlaceDetailScreen({super.key, required this.place});
+  const ContentDetailScreen({
+    super.key,
+    required this.content,
+  });
 
   @override
-  State<PlaceDetailScreen> createState() => _PlaceDetailScreenState();
+  State<ContentDetailScreen> createState() => _ContentDetailScreenState();
 }
 
-class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
+class _ContentDetailScreenState extends State<ContentDetailScreen> {
   int _currentImageIndex = 0;
 
   // Временные ссылки для демонстрации (будут заменены реальными)
@@ -21,108 +24,52 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
     'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%201',
     'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%202',
     'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%203',
-    'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%204',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.place.name),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.map),
-            tooltip: 'Показать на карте',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MapScreen(place: widget.place),
-                ),
-              );
-            },
-          ),
-        ],
+        title: Text(widget.content.title),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.place.imageUrl != null)
-              Hero(
-                tag: 'place_image_${widget.place.name}',
-                child: Image.network(
-                  widget.place.imageUrl!,
-                  width: double.infinity,
-                  height: 250,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: double.infinity,
-                      height: 250,
-                      color: Colors.grey.shade300,
-                      child: const Center(
-                        child: Icon(Icons.image_not_supported, size: 50),
-                      ),
-                    );
-                  },
-                ),
-              )
-            else
-              Container(
-                width: double.infinity,
+            Hero(
+              tag: 'content-${widget.content.id}',
+              child: Image.asset(
+                widget.content.imageUrl,
                 height: 250,
-                color: Colors.grey.shade200,
-                child: Icon(
-                  getIconForType(widget.place.type),
-                  size: 100,
-                  color: Colors.grey.shade400,
-                ),
+                width: double.infinity,
+                fit: BoxFit.cover,
               ),
+            ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          getIconForType(widget.place.type),
-                          color: Theme.of(context).primaryColor,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          widget.place.type.label,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   Text(
-                    widget.place.name,
+                    widget.content.title,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                   ),
                   const SizedBox(height: 8),
+                  Text(
+                    widget.content.description,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[700],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   const Divider(),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
                   const Text(
-                    'Описание',
+                    'Содержание',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -130,8 +77,11 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    widget.place.description,
-                    style: Theme.of(context).textTheme.bodyLarge,
+                    widget.content.content!,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      height: 1.6,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   const Divider(),
@@ -274,19 +224,37 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                     }).toList(),
                   ),
                   const SizedBox(height: 32),
-                  ElevatedButton.icon(
+                  ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MapScreen(place: widget.place),
+                          builder: (context) =>
+                              TestScreen(content: widget.content),
                         ),
                       );
                     },
-                    icon: const Icon(Icons.location_on),
-                    label: const Text('Показать на карте'),
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.quiz, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Проверить знания (${widget.content.questions.length} вопросов)',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

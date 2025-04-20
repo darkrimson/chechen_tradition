@@ -1,7 +1,7 @@
-import 'package:chechen_tradition/features/education/screens/education/education_screen.dart';
-import 'package:chechen_tradition/features/main/screens/home/home_screen.dart';
-import 'package:chechen_tradition/features/map_and_places/screens/place/places_list_screen.dart';
-import 'package:chechen_tradition/features/traditions/screens/traditions_list_screen.dart';
+import 'package:chechen_tradition/features/education/ui/education/education_screen.dart';
+import 'package:chechen_tradition/features/main/home/ui/home_screen.dart';
+import 'package:chechen_tradition/features/places/ui/place/places_list_screen.dart';
+import 'package:chechen_tradition/features/traditions/ui/traditions_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

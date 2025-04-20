@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:chechen_tradition/data/places/mock_places.dart';
-import 'package:chechen_tradition/features/map_and_places/models/culture_place.dart';
+import 'package:chechen_tradition/features/places/models/culture_place.dart';
 
 class PlacesProvider with ChangeNotifier {
   List<CulturalPlace> _places = [];

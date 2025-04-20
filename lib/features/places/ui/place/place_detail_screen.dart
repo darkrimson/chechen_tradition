@@ -1,22 +1,19 @@
+import 'package:chechen_tradition/features/places/models/culture_place.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import '../../models/education.dart';
-import 'package:chechen_tradition/features/education/screens/test/test_screen.dart';
+import '../map/map_screen.dart';
 
-class ContentDetailScreen extends StatefulWidget {
-  final EducationalContent content;
+class PlaceDetailScreen extends StatefulWidget {
+  final CulturalPlace place;
 
-  const ContentDetailScreen({
-    super.key,
-    required this.content,
-  });
+  const PlaceDetailScreen({super.key, required this.place});
 
   @override
-  State<ContentDetailScreen> createState() => _ContentDetailScreenState();
+  State<PlaceDetailScreen> createState() => _PlaceDetailScreenState();
 }
 
-class _ContentDetailScreenState extends State<ContentDetailScreen> {
+class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
   int _currentImageIndex = 0;
 
   // Временные ссылки для демонстрации (будут заменены реальными)
@@ -24,52 +21,109 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
     'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%201',
     'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%202',
     'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%203',
+    'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%204',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.content.title),
+        title: Text(widget.place.name),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.map),
+            tooltip: 'Показать на карте',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MapScreen(place: widget.place),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Hero(
-              tag: 'content-${widget.content.id}',
-              child: Image.asset(
-                widget.content.imageUrl,
-                height: 250,
+            if (widget.place.imageUrl != null)
+              Hero(
+                tag: 'place_image_${widget.place.name}',
+                child: Image.network(
+                  widget.place.imageUrl!,
+                  width: double.infinity,
+                  height: 250,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: double.infinity,
+                      height: 250,
+                      color: Colors.grey.shade300,
+                      child: const Center(
+                        child: Icon(Icons.image_not_supported, size: 50),
+                      ),
+                    );
+                  },
+                ),
+              )
+            else
+              Container(
                 width: double.infinity,
-                fit: BoxFit.cover,
+                height: 250,
+                color: Colors.grey.shade200,
+                child: Icon(
+                  widget.place.type.icon,
+                  size: 100,
+                  color: Colors.grey.shade400,
+                ),
               ),
-            ),
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color:
+                          getCategoryColor(widget.place.type).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          widget.place.type.icon,
+                          color: getCategoryColor(widget.place.type),
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          widget.place.type.label,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: getCategoryColor(widget.place.type),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Text(
-                    widget.content.title,
+                    widget.place.name,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    widget.content.description,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[700],
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   const Divider(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   const Text(
-                    'Содержание',
+                    'Описание',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
@@ -77,11 +131,8 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    widget.content.content!,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 1.6,
-                    ),
+                    widget.place.description,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 24),
                   const Divider(),
@@ -97,7 +148,7 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
                         ),
                       ),
                       Text(
-                        '${_currentImageIndex + 1}/${demoImages.length}',
+                        '${_currentImageIndex + 1}/${widget.place.images?.length ?? 0}',
                         style: TextStyle(
                           color: Colors.grey.shade700,
                           fontWeight: FontWeight.bold,
@@ -122,13 +173,13 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
                         });
                       },
                     ),
-                    items: demoImages.map((imageUrl) {
+                    items: widget.place.images?.map((imageUrl) {
                       return Builder(
                         builder: (BuildContext context) {
                           return GestureDetector(
                             onTap: () {
                               _showFullScreenImage(
-                                  context, imageUrl, demoImages);
+                                  context, imageUrl, widget.place.images!);
                             },
                             child: Container(
                               width: MediaQuery.of(context).size.width,
@@ -209,7 +260,7 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: demoImages.asMap().entries.map((entry) {
+                    children: widget.place.images!.asMap().entries.map((entry) {
                       return Container(
                         width: 8.0,
                         height: 8.0,
@@ -223,40 +274,23 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
                       );
                     }).toList(),
                   ),
-                  const SizedBox(height: 32),
-                  ElevatedButton(
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              TestScreen(content: widget.content),
+                          builder: (context) => MapScreen(place: widget.place),
                         ),
                       );
                     },
+                    icon: const Icon(Icons.location_on),
+                    label: const Text('Показать на карте'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.quiz, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Проверить знания (${widget.content.questions.length} вопросов)',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
                     ),
                   ),
+                  SizedBox(height: 30),
                 ],
               ),
             ),

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 // Импорт всех провайдеров
-import 'package:chechen_tradition/features/traditions/models/tradition_provider.dart';
-import 'package:chechen_tradition/features/education/models/education_provider.dart';
-import 'package:chechen_tradition/features/map_and_places/models/places_provider.dart';
-import 'package:chechen_tradition/features/main/screens/search/services/search_provider.dart';
-import 'package:chechen_tradition/features/main/screens/settings/settings_provider.dart';
+import 'package:chechen_tradition/features/traditions/provider/tradition_provider.dart';
+import 'package:chechen_tradition/features/education/provider/education_provider.dart';
+import 'package:chechen_tradition/features/places/provider/places_provider.dart';
+import 'package:chechen_tradition/features/main/search/services/search_provider.dart';
+import 'package:chechen_tradition/features/main/settings/provider/settings_provider.dart';
 
 /// Класс для организации всех провайдеров приложения
 class AppProviders extends StatelessWidget {

@@ -1,6 +1,8 @@
-import 'package:chechen_tradition/data/places/places_repository.dart';
-import 'package:chechen_tradition/features/map_and_places/models/culture_place.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chechen_tradition/features/places/models/culture_place.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:chechen_tradition/features/places/provider/places_provider.dart';
 import 'place_detail_screen.dart';
 
 class PlacesListScreen extends StatefulWidget {
@@ -19,11 +21,20 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
   void initState() {
     super.initState();
     _selectedFilter = widget.initialFilter;
+    // Устанавливаем начальный фильтр в провайдере, если он передан
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.initialFilter != null) {
+        Provider.of<PlacesProvider>(context, listen: false)
+            .setFilter(widget.initialFilter);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final filteredPlaces = PlacesRepository().filteredPlaces;
+    // Используем провайдер вместо репозитория
+    final placesProvider = Provider.of<PlacesProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Список мест'),
@@ -64,6 +75,7 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                     setState(() {
                       _selectedFilter = null;
                     });
+                    placesProvider.setFilter(null);
                   },
                   showCheckmark: false,
                 ),
@@ -98,6 +110,7 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                           setState(() {
                             _selectedFilter = selected ? type : null;
                           });
+                          placesProvider.setFilter(selected ? type : null);
                         },
                         showCheckmark: false,
                       ),
@@ -107,9 +120,9 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: filteredPlaces(_selectedFilter).length,
+              itemCount: placesProvider.getFilteredPlaces().length,
               itemBuilder: (context, index) {
-                final place = filteredPlaces(_selectedFilter)[index];
+                final place = placesProvider.getFilteredPlaces()[index];
                 return Card(
                   margin:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -131,23 +144,17 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                               tag: 'place_image_${place.name}',
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  place.imageUrl!,
-                                  width: 80,
-                                  height: 80,
+                                child: CachedNetworkImage(
+                                  imageUrl: place.imageUrl!,
+                                  width: 100,
+                                  height: 100,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: 80,
-                                      height: 80,
-                                      color: Colors.grey.shade300,
-                                      child: Icon(
-                                        getIconForType(place.type),
-                                        size: 40,
-                                        color: Colors.grey.shade700,
-                                      ),
-                                    );
-                                  },
+                                  placeholder: (context, url) => Container(
+                                    color: Colors.grey.shade300,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
                                 ),
                               ),
                             )
@@ -160,7 +167,7 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                                getIconForType(place.type),
+                                place.type.icon,
                                 size: 40,
                                 color: Colors.grey.shade700,
                               ),
@@ -192,16 +199,15 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .primaryColor
-                                        .withOpacity(0.1),
+                                    color: getCategoryColor(place.type)
+                                        .withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
                                     place.type.label,
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: Theme.of(context).primaryColor,
+                                      color: getCategoryColor(place.type),
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

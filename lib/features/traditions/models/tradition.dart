@@ -30,3 +30,16 @@ enum TraditionCategory {
   final IconData iconPath;
   const TraditionCategory(this.label, this.iconPath);
 }
+
+Color getCategoryColor(TraditionCategory category) {
+  switch (category) {
+    case TraditionCategory.clothing:
+      return Colors.blue;
+    case TraditionCategory.cuisine:
+      return Colors.orange;
+    case TraditionCategory.crafts:
+      return Colors.amber.shade800;
+    case TraditionCategory.holidays:
+      return Colors.green;
+  }
+}

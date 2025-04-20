@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/traditions/models/tradition.dart';
-import 'package:chechen_tradition/features/traditions/screens/tradition_detail_screen.dart';
-import 'package:chechen_tradition/features/traditions/models/tradition_provider.dart';
+import 'package:chechen_tradition/features/traditions/ui/tradition_detail_screen.dart';
+import 'package:chechen_tradition/features/traditions/provider/tradition_provider.dart';
 
 class TraditionsListScreen extends StatelessWidget {
   final TraditionCategory? initialFilter;
 
-  const TraditionsListScreen({Key? key, this.initialFilter}) : super(key: key);
+  const TraditionsListScreen({super.key, this.initialFilter});
 
   @override
   Widget build(BuildContext context) {
@@ -134,8 +134,8 @@ class TraditionsListScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.asset(
                                   tradition.imageUrl,
-                                  width: 100,
-                                  height: 100,
+                                  width: 80,
+                                  height: 80,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Container(
@@ -178,16 +178,16 @@ class TraditionsListScreen extends StatelessWidget {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: _getCategoryColor(
-                                                tradition.category)
-                                            .withOpacity(0.2),
+                                        color:
+                                            getCategoryColor(tradition.category)
+                                                .withOpacity(0.2),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
                                         tradition.category.label,
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: _getCategoryColor(
+                                          color: getCategoryColor(
                                               tradition.category),
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -230,18 +230,5 @@ class TraditionsListScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Color _getCategoryColor(TraditionCategory category) {
-    switch (category) {
-      case TraditionCategory.clothing:
-        return Colors.blue;
-      case TraditionCategory.cuisine:
-        return Colors.orange;
-      case TraditionCategory.crafts:
-        return Colors.amber.shade800;
-      case TraditionCategory.holidays:
-        return Colors.green;
-    }
   }
 }

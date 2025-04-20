@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 import '../models/search_result.dart';
 import '../services/search_provider.dart';
-import 'package:chechen_tradition/features/map_and_places/screens/place/place_detail_screen.dart';
-import 'package:chechen_tradition/features/traditions/screens/tradition_detail_screen.dart';
+import 'package:chechen_tradition/features/places/ui/place/place_detail_screen.dart';
+import 'package:chechen_tradition/features/traditions/ui/tradition_detail_screen.dart';
 // import 'package:chechen_tradition/features/education/screens/education_detail_screen.dart';
 
 class SearchPage extends StatefulWidget {

@@ -1,12 +1,12 @@
 import 'package:chechen_tradition/data/places/mock_places.dart';
 import 'package:chechen_tradition/data/traditions/mock_traditions.dart';
-import 'package:chechen_tradition/features/main/screens/settings/settings_screen.dart';
-import 'package:chechen_tradition/features/main/screens/search/ui/search_page.dart';
-import 'package:chechen_tradition/features/map_and_places/screens/place/place_detail_screen.dart';
-import 'package:chechen_tradition/features/map_and_places/screens/place/places_list_screen.dart';
-import 'package:chechen_tradition/features/map_and_places/models/culture_place.dart';
-import 'package:chechen_tradition/features/traditions/screens/tradition_detail_screen.dart';
-import 'package:chechen_tradition/features/traditions/screens/traditions_list_screen.dart';
+import 'package:chechen_tradition/features/main/settings/ui/settings_screen.dart';
+import 'package:chechen_tradition/features/main/search/ui/search_page.dart';
+import 'package:chechen_tradition/features/places/ui/place/place_detail_screen.dart';
+import 'package:chechen_tradition/features/places/ui/place/places_list_screen.dart';
+import 'package:chechen_tradition/features/places/models/culture_place.dart';
+import 'package:chechen_tradition/features/traditions/ui/tradition_detail_screen.dart';
+import 'package:chechen_tradition/features/traditions/ui/traditions_list_screen.dart';
 import 'package:chechen_tradition/features/traditions/models/tradition.dart';
 import 'package:flutter/material.dart';
 

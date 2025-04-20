@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:chechen_tradition/features/main/screens/settings/settings_provider.dart';
+import 'package:chechen_tradition/features/main/settings/provider/settings_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});

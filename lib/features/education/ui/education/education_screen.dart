@@ -1,5 +1,5 @@
 import 'package:chechen_tradition/data/education/mock_education.dart';
-import 'package:chechen_tradition/features/education/screens/education/education_detail_screen.dart';
+import 'package:chechen_tradition/features/education/ui/education/education_detail_screen.dart';
 import 'package:flutter/material.dart';
 import '../../models/education.dart';
 import '../test/test_list_screen.dart';

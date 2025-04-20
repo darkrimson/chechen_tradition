@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/traditions/models/tradition.dart';
-import 'package:chechen_tradition/features/traditions/models/tradition_provider.dart';
+import 'package:chechen_tradition/features/traditions/provider/tradition_provider.dart';
 
 class TraditionDetailScreen extends StatelessWidget {
   final Tradition tradition;
 
-  const TraditionDetailScreen({Key? key, required this.tradition})
-      : super(key: key);
+  const TraditionDetailScreen({super.key, required this.tradition});
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,4 @@
-import 'package:chechen_tradition/features/map_and_places/models/culture_place.dart';
+import 'package:chechen_tradition/features/places/models/culture_place.dart';
 import 'package:flutter/material.dart';
 import 'package:yandex_maps_mapkit/mapkit.dart';
 import 'package:yandex_maps_mapkit/mapkit_factory.dart';
@@ -44,7 +44,7 @@ class _MapScreenState extends State<MapScreen> {
                     scale: 0.4, flat: true, rotationType: RotationType.Rotate));
               _mapWindow?.map.move(
                 CameraPosition(widget.place.location,
-                    zoom: 17.5, azimuth: 0, tilt: 0),
+                    zoom: 16, azimuth: 0, tilt: 0),
               );
             },
           ),
@@ -55,7 +55,7 @@ class _MapScreenState extends State<MapScreen> {
               onPressed: () {
                 _mapWindow?.map.move(
                   CameraPosition(widget.place.location,
-                      zoom: 17.5, azimuth: 0, tilt: 0),
+                      zoom: 16, azimuth: 0, tilt: 0),
                 );
               },
               child: const Icon(Icons.center_focus_strong),
