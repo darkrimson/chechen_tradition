@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'dart:async';
 import '../models/search_result.dart';
-import '../services/search_service.dart';
+import '../services/search_provider.dart';
 import 'package:chechen_tradition/features/map_and_places/screens/place/place_detail_screen.dart';
 import 'package:chechen_tradition/features/traditions/screens/tradition_detail_screen.dart';
 // import 'package:chechen_tradition/features/education/screens/education_detail_screen.dart';
@@ -14,116 +16,23 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
-  final SearchService _searchService = SearchService();
-
-  List<SearchResult> _searchResults = [];
-  List<String> _searchHistory = [];
-  bool _isLoading = false;
-  bool _showHistory = true;
+  // Таймер для дебаунса поиска
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    _loadSearchHistory();
   }
 
-  Future<void> _loadSearchHistory() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      final history = await _searchService.getSearchHistory();
-
-      setState(() {
-        _searchHistory = history;
-        _isLoading = false;
-      });
-    } catch (e) {
-      // В случае ошибки показываем пустую историю
-      setState(() {
-        _searchHistory = [];
-        _isLoading = false;
-      });
-      debugPrint('Ошибка при загрузке истории поиска: $e');
-    }
-  }
-
-  Future<void> _performSearch(String query) async {
-    if (query.trim().isEmpty) {
-      setState(() {
-        _searchResults = [];
-        _showHistory = true;
-      });
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _showHistory = false;
-    });
-
-    try {
-      final results = await _searchService.search(query);
-
-      if (mounted) {
-        setState(() {
-          _searchResults = results;
-          _isLoading = false;
-        });
-      }
-
-      try {
-        await _searchService.saveToHistory(query);
-
-        // Обновляем историю после сохранения
-        if (mounted) {
-          _loadSearchHistory();
-        }
-      } catch (historyError) {
-        debugPrint('Ошибка при сохранении истории: $historyError');
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка поиска: $e')),
-        );
-      }
-    }
-  }
-
-  void _clearSearch() {
-    _searchController.clear();
-    setState(() {
-      _searchResults = [];
-      _showHistory = true;
-    });
-  }
-
-  Future<void> _clearHistory() async {
-    try {
-      await _searchService.clearSearchHistory();
-
-      setState(() {
-        _searchHistory = [];
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('История поиска очищена')),
-      );
-    } catch (e) {
-      debugPrint('Ошибка при очистке истории: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не удалось очистить историю поиска')),
-      );
-    }
-  }
-
+  // При нажатии на результат: сохраняем запрос в историю и переходим к детальному просмотру
   void _navigateToDetail(BuildContext context, SearchResult result) {
+    // Сначала сохраняем текущий запрос в историю
+    if (_searchController.text.isNotEmpty) {
+      Provider.of<SearchProvider>(context, listen: false)
+          .saveCurrentQueryToHistory();
+    }
+
+    // Затем переходим к детальному просмотру
     switch (result.type) {
       case SearchResultType.place:
         Navigator.push(
@@ -154,11 +63,25 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void dispose() {
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
+  }
+
+  // Функция для дебаунса поиска при вводе текста
+  void _onSearchChanged(String query, SearchProvider provider) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    // Задержка в 300 мс перед выполнением поиска
+    // чтобы не делать запрос при каждом нажатии клавиши
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      provider.searchOnType(query);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final searchProvider = Provider.of<SearchProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Поиск'),
@@ -175,7 +98,10 @@ class _SearchPageState extends State<SearchPage> {
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
-                        onPressed: _clearSearch,
+                        onPressed: () {
+                          _searchController.clear();
+                          searchProvider.clearSearch();
+                        },
                       )
                     : null,
                 border: OutlineInputBorder(
@@ -186,30 +112,42 @@ class _SearchPageState extends State<SearchPage> {
               ),
               onChanged: (value) {
                 if (value.isEmpty) {
-                  setState(() {
-                    _searchResults = [];
-                    _showHistory = true;
-                  });
+                  searchProvider.clearSearch();
+                } else {
+                  // Выполняем поиск при вводе текста
+                  _onSearchChanged(value, searchProvider);
                 }
               },
-              onSubmitted: _performSearch,
+              onSubmitted: (value) {
+                // При нажатии Enter выполняем полноценный поиск
+                if (value.isNotEmpty) {
+                  searchProvider.performSearch(value);
+                }
+              },
               textInputAction: TextInputAction.search,
             ),
           ),
           Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _showHistory
-                    ? _buildSearchHistory()
-                    : _buildSearchResults(),
+            child: Consumer<SearchProvider>(
+              builder: (context, provider, child) {
+                if (provider.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (_searchController.text.isEmpty) {
+                  // Проверяем именно текст поля ввода, а не currentQuery
+                  return _buildSearchHistory(provider);
+                } else {
+                  return _buildSearchResults(provider);
+                }
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSearchHistory() {
-    if (_searchHistory.isEmpty) {
+  Widget _buildSearchHistory(SearchProvider provider) {
+    if (provider.searchHistory.isEmpty) {
       return const Center(
         child: Text('История поиска пуста'),
       );
@@ -231,7 +169,9 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
               TextButton(
-                onPressed: _clearHistory,
+                onPressed: () {
+                  provider.clearHistory();
+                },
                 child: const Text('Очистить'),
               ),
             ],
@@ -239,14 +179,14 @@ class _SearchPageState extends State<SearchPage> {
         ),
         Expanded(
           child: ListView.builder(
-            itemCount: _searchHistory.length,
+            itemCount: provider.searchHistory.length,
             itemBuilder: (context, index) {
               return ListTile(
                 leading: const Icon(Icons.history),
-                title: Text(_searchHistory[index]),
+                title: Text(provider.searchHistory[index]),
                 onTap: () {
-                  _searchController.text = _searchHistory[index];
-                  _performSearch(_searchHistory[index]);
+                  _searchController.text = provider.searchHistory[index];
+                  provider.searchFromHistory(provider.searchHistory[index]);
                 },
               );
             },
@@ -256,99 +196,123 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildSearchResults() {
-    if (_searchResults.isEmpty) {
+  Widget _buildSearchResults(SearchProvider provider) {
+    if (provider.searchResults.isEmpty) {
       return const Center(
         child: Text('Ничего не найдено'),
       );
     }
 
-    return ListView.builder(
-      itemCount: _searchResults.length,
-      itemBuilder: (context, index) {
-        final result = _searchResults[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: InkWell(
-            onTap: () => _navigateToDetail(context, result),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child:
-                        result.imageUrl != null && result.imageUrl!.isNotEmpty
-                            ? (result.imageUrl!.startsWith('http')
-                                ? Image.network(
-                                    result.imageUrl!,
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return _buildPlaceholderImage(result);
-                                    },
-                                  )
-                                : Image.asset(
-                                    result.imageUrl!,
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return _buildPlaceholderImage(result);
-                                    },
-                                  ))
-                            : _buildPlaceholderImage(result),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          result.title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          result.description,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: _getColorForType(result.type),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            result.type.displayName,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.arrow_forward_ios, size: 16),
-                ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Заголовок с текущим поисковым запросом
+        if (provider.currentQuery.isNotEmpty)
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Text(
+              'Результаты поиска по запросу "${provider.currentQuery}"',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
-        );
-      },
+        Expanded(
+          child: ListView.builder(
+            itemCount: provider.searchResults.length,
+            itemBuilder: (context, index) {
+              final result = provider.searchResults[index];
+              return Card(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: InkWell(
+                  onTap: () => _navigateToDetail(context, result),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: result.imageUrl != null &&
+                                  result.imageUrl!.isNotEmpty
+                              ? (result.imageUrl!.startsWith('http')
+                                  ? Image.network(
+                                      result.imageUrl!,
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return _buildPlaceholderImage(result);
+                                      },
+                                    )
+                                  : Image.asset(
+                                      result.imageUrl!,
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return _buildPlaceholderImage(result);
+                                      },
+                                    ))
+                              : _buildPlaceholderImage(result),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                result.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                result.description,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: _getColorForType(result.type),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  result.type.displayName,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.arrow_forward_ios, size: 16),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 

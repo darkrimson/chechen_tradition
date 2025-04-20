@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/traditions/models/tradition.dart';
+import 'package:chechen_tradition/features/traditions/models/tradition_provider.dart';
 
 class TraditionDetailScreen extends StatelessWidget {
   final Tradition tradition;
@@ -9,6 +11,9 @@ class TraditionDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Получаем провайдер традиций
+    final traditionProvider = Provider.of<TraditionProvider>(context);
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -107,14 +112,15 @@ class TraditionDetailScreen extends StatelessWidget {
                           : Icons.favorite_border,
                       color: tradition.isLiked ? Colors.red : null,
                     ),
-                    onPressed: () {
-                      // Логика для добавления в избранное
+                    onPressed: () async {
+                      // Используем провайдер для переключения избранного
+                      await traditionProvider.toggleFavorite(tradition.id);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
                             tradition.isLiked
-                                ? 'Удалено из избранного'
-                                : 'Добавлено в избранное',
+                                ? 'Добавлено в избранное'
+                                : 'Удалено из избранного',
                           ),
                         ),
                       );
@@ -177,53 +183,86 @@ class TraditionDetailScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: SizedBox(
               height: 220,
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                scrollDirection: Axis.horizontal,
-                itemCount: 3, // Показываем до 3 похожих традиций
-                itemBuilder: (context, index) {
-                  return Container(
-                    width: 160,
-                    margin: const EdgeInsets.only(right: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                            height: 120,
-                            color: Colors.grey.shade300,
-                            child: Center(
-                              child: Icon(
-                                tradition.category.iconPath,
-                                size: 40,
-                                color: Colors.grey.shade700,
+              child: Consumer<TraditionProvider>(
+                builder: (context, provider, child) {
+                  // Получаем другие традиции той же категории
+                  final similarTraditions = provider.traditions
+                      .where((t) =>
+                          t.category == tradition.category &&
+                          t.id != tradition.id)
+                      .take(3)
+                      .toList();
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: similarTraditions.length,
+                    itemBuilder: (context, index) {
+                      final similarTradition = similarTraditions[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TraditionDetailScreen(
+                                tradition: similarTradition,
                               ),
                             ),
+                          );
+                        },
+                        child: Container(
+                          width: 160,
+                          margin: const EdgeInsets.only(right: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.asset(
+                                  similarTradition.imageUrl,
+                                  height: 120,
+                                  width: 160,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      height: 120,
+                                      color: Colors.grey.shade300,
+                                      child: Center(
+                                        child: Icon(
+                                          similarTradition.category.iconPath,
+                                          size: 40,
+                                          color: Colors.grey.shade700,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                similarTradition.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                similarTradition.description,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade700,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Похожая традиция ${index + 1}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Краткое описание традиции',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade700,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               ),

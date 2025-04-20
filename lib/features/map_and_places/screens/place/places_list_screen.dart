@@ -1,7 +1,6 @@
 import 'package:chechen_tradition/data/places/places_repository.dart';
 import 'package:chechen_tradition/features/map_and_places/models/culture_place.dart';
 import 'package:flutter/material.dart';
-import '../map/map_screen.dart';
 import 'place_detail_screen.dart';
 
 class PlacesListScreen extends StatefulWidget {

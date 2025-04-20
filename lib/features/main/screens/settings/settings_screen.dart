@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:chechen_tradition/features/main/screens/settings/settings_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Получаем провайдер настроек
+    final settingsProvider = Provider.of<SettingsProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Настройки'),
@@ -59,88 +64,85 @@ class SettingsScreen extends StatelessWidget {
             subtitle: 'Освободить место на устройстве',
             icon: Icons.cleaning_services,
             onTap: () {
-              _showClearCacheDialog(context);
+              _showClearCacheDialog(context, settingsProvider);
             },
           ),
 
           // Категория: Карта
           _buildSectionHeader(context, 'Карта'),
 
-          SwitchListTile(
-            title: const Text('Использовать геолокацию'),
-            subtitle: const Text('Показывать ваше местоположение на карте'),
-            secondary: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
+          Consumer<SettingsProvider>(builder: (context, provider, child) {
+            return SwitchListTile(
+              title: const Text('Использовать геолокацию'),
+              subtitle: const Text('Показывать ваше местоположение на карте'),
+              secondary: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.location_on,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
-              child: Icon(
-                Icons.location_on,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            value: true,
-            onChanged: (value) {
-              // Будущая функциональность
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Функция находится в разработке')),
-              );
-            },
-          ),
+              value: provider.useGeolocation,
+              onChanged: (value) {
+                provider.setUseGeolocation(value);
+              },
+            );
+          }),
 
-          SwitchListTile(
-            title: const Text('Загружать карты офлайн'),
-            subtitle: const Text('Доступ к картам без интернета'),
-            secondary: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
+          Consumer<SettingsProvider>(builder: (context, provider, child) {
+            return SwitchListTile(
+              title: const Text('Загружать карты офлайн'),
+              subtitle: const Text('Доступ к картам без интернета'),
+              secondary: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.map,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
-              child: Icon(
-                Icons.map,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            value: false,
-            onChanged: (value) {
-              // Будущая функциональность
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Функция находится в разработке')),
-              );
-            },
-          ),
+              value: provider.offlineMaps,
+              onChanged: (value) {
+                provider.setOfflineMaps(value);
+              },
+            );
+          }),
 
           // Категория: Уведомления
           _buildSectionHeader(context, 'Уведомления'),
 
-          SwitchListTile(
-            title: const Text('Уведомления о новых событиях'),
-            subtitle: const Text(
-                'Получать информацию о новых культурных мероприятиях'),
-            secondary: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
+          Consumer<SettingsProvider>(builder: (context, provider, child) {
+            return SwitchListTile(
+              title: const Text('Уведомления о новых событиях'),
+              subtitle: const Text(
+                  'Получать информацию о новых культурных мероприятиях'),
+              secondary: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.notifications,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
-              child: Icon(
-                Icons.notifications,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            value: true,
-            onChanged: (value) {
-              // Будущая функциональность
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Функция находится в разработке')),
-              );
-            },
-          ),
+              value: provider.notifications,
+              onChanged: (value) {
+                provider.setNotifications(value);
+              },
+            );
+          }),
 
           // Кнопка выхода из аккаунта в будущем
           const SizedBox(height: 32),
@@ -242,7 +244,7 @@ class SettingsScreen extends StatelessWidget {
   }
 
   // Диалог очистки кэша
-  void _showClearCacheDialog(BuildContext context) {
+  void _showClearCacheDialog(BuildContext context, SettingsProvider provider) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -258,10 +260,12 @@ class SettingsScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Логика очистки кэша
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Кэш успешно очищен')),
-              );
+              // Логика очистки кэша через провайдер
+              provider.clearCache().then((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Кэш успешно очищен')),
+                );
+              });
             },
             child: const Text('Очистить'),
           ),
