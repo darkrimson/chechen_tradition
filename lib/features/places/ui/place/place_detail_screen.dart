@@ -16,16 +16,11 @@ class PlaceDetailScreen extends StatefulWidget {
 class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
   int _currentImageIndex = 0;
 
-  // Временные ссылки для демонстрации (будут заменены реальными)
-  final List<String> demoImages = [
-    'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%201',
-    'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%202',
-    'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%203',
-    'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%204',
-  ];
-
   @override
   Widget build(BuildContext context) {
+    // Получаем фактическое количество изображений
+    int imagesCount = widget.place.images?.length ?? 0;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.place.name),
@@ -51,12 +46,19 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
             if (widget.place.imageUrl != null)
               Hero(
                 tag: 'place_image_${widget.place.name}',
-                child: Image.network(
-                  widget.place.imageUrl!,
+                child: CachedNetworkImage(
+                  imageUrl: widget.place.imageUrl!,
                   width: double.infinity,
                   height: 250,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey.shade300,
+                    height: 250,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                  errorWidget: (context, error, stackTrace) {
                     return Container(
                       width: double.infinity,
                       height: 250,
@@ -134,146 +136,158 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                     widget.place.description,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
-                  const SizedBox(height: 24),
-                  const Divider(),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Фотогалерея',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                  if (imagesCount > 0) ...[
+                    const SizedBox(height: 24),
+                    const Divider(),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Фотогалерея',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '${_currentImageIndex + 1}/${widget.place.images?.length ?? 0}',
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontWeight: FontWeight.bold,
+                        Text(
+                          '${_currentImageIndex + 1}/${imagesCount}',
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  CarouselSlider(
-                    options: CarouselOptions(
-                      height: 200,
-                      viewportFraction: 0.8,
-                      enableInfiniteScroll: true,
-                      autoPlay: true,
-                      autoPlayInterval: const Duration(seconds: 3),
-                      autoPlayAnimationDuration:
-                          const Duration(milliseconds: 800),
-                      enlargeCenterPage: true,
-                      onPageChanged: (index, reason) {
-                        setState(() {
-                          _currentImageIndex = index;
-                        });
-                      },
+                      ],
                     ),
-                    items: widget.place.images?.map((imageUrl) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return GestureDetector(
-                            onTap: () {
-                              _showFullScreenImage(
-                                  context, imageUrl, widget.place.images!);
-                            },
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 5.0),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    spreadRadius: 1,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Stack(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: CachedNetworkImage(
-                                      imageUrl: imageUrl,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) => Container(
-                                        color: Colors.grey.shade300,
-                                        child: const Center(
-                                          child: CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    CarouselSlider(
+                      options: CarouselOptions(
+                        height: 200,
+                        viewportFraction: 0.8,
+                        enableInfiniteScroll: true,
+                        autoPlay: true,
+                        autoPlayInterval: const Duration(seconds: 3),
+                        autoPlayAnimationDuration:
+                            const Duration(milliseconds: 800),
+                        enlargeCenterPage: true,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentImageIndex = index;
+                          });
+                        },
+                      ),
+                      items: widget.place.images?.map((imageUrl) {
+                            return Builder(
+                              builder: (BuildContext context) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    _showFullScreenImage(context, imageUrl,
+                                        widget.place.images!);
+                                  },
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 5.0),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          spreadRadius: 1,
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
                                         ),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Container(
-                                        color: Colors.grey.shade200,
-                                        child: Center(
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              const Icon(Icons.error,
-                                                  color: Colors.grey),
-                                              const SizedBox(height: 8),
-                                              Text(
-                                                'Ошибка загрузки',
-                                                style: TextStyle(
-                                                  color: Colors.grey.shade700,
-                                                  fontSize: 12,
+                                      ],
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          child: CachedNetworkImage(
+                                            imageUrl: imageUrl,
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) =>
+                                                Container(
+                                              color: Colors.grey.shade300,
+                                              child: const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              ),
+                                            ),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Container(
+                                              color: Colors.grey.shade200,
+                                              child: Center(
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    const Icon(Icons.error,
+                                                        color: Colors.grey),
+                                                    const SizedBox(height: 8),
+                                                    Text(
+                                                      'Ошибка загрузки',
+                                                      style: TextStyle(
+                                                        color: Colors
+                                                            .grey.shade700,
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                            ],
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                        Positioned(
+                                          right: 10,
+                                          bottom: 10,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(6),
+                                            decoration: BoxDecoration(
+                                              color: Colors.black54,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: const Icon(
+                                              Icons.zoom_in,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  Positioned(
-                                    right: 10,
-                                    bottom: 10,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(6),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black54,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: const Icon(
-                                        Icons.zoom_in,
-                                        color: Colors.white,
-                                        size: 20,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                );
+                              },
+                            );
+                          }).toList() ??
+                          [],
+                    ),
+                    if (imagesCount > 1) ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children:
+                            widget.place.images!.asMap().entries.map((entry) {
+                          return Container(
+                            width: 8.0,
+                            height: 8.0,
+                            margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _currentImageIndex == entry.key
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.grey.shade400,
                             ),
                           );
-                        },
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: widget.place.images!.asMap().entries.map((entry) {
-                      return Container(
-                        width: 8.0,
-                        height: 8.0,
-                        margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _currentImageIndex == entry.key
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey.shade400,
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                        }).toList(),
+                      ),
+                    ],
+                  ],
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: () {
@@ -290,7 +304,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                       minimumSize: const Size(double.infinity, 50),
                     ),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),

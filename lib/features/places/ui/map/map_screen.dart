@@ -1,12 +1,6 @@
 import 'package:chechen_tradition/features/places/models/culture_place.dart';
 import 'package:flutter/material.dart';
-import 'package:yandex_maps_mapkit/mapkit.dart';
-import 'package:yandex_maps_mapkit/mapkit_factory.dart';
-// ignore: implementation_imports
-import 'package:yandex_maps_mapkit/src/bindings/image/image_provider.dart'
-    // ignore: library_prefixes
-    as yandexImage;
-import 'package:yandex_maps_mapkit/yandex_map.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 class MapScreen extends StatefulWidget {
   final CulturalPlace place;
@@ -18,7 +12,13 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  MapWindow? _mapWindow;
+  late final MapController _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapController = MapController();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,41 +28,71 @@ class _MapScreenState extends State<MapScreen> {
       ),
       body: Stack(
         children: [
-          YandexMap(
-            platformViewType: PlatformViewType.Hybrid,
-            onMapCreated: (MapWindow mapWindow) {
-              final imageProvider =
-                  yandexImage.ImageProvider.fromImageProvider(const AssetImage(
-                "images/mark.png",
-              ));
-              mapkit.onStart();
-              _mapWindow = mapWindow;
-              mapWindow.map.mapObjects.addPlacemark()
-                ..geometry = widget.place.location
-                ..setIcon(imageProvider)
-                ..setIconStyle(IconStyle(
-                    scale: 0.4, flat: true, rotationType: RotationType.Rotate));
-              _mapWindow?.map.move(
-                CameraPosition(widget.place.location,
-                    zoom: 16, azimuth: 0, tilt: 0),
-              );
-            },
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              initialCenter: widget.place.latLng,
+              initialZoom: 14.0,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.chechen_tradition.app',
+                subdomains: const ['a', 'b', 'c'],
+              ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: widget.place.latLng,
+                    width: 50.0,
+                    height: 50.0,
+                    child: _buildMarker(),
+                  ),
+                ],
+              ),
+            ],
           ),
           Positioned(
             bottom: 16,
             right: 16,
             child: FloatingActionButton(
               onPressed: () {
-                _mapWindow?.map.move(
-                  CameraPosition(widget.place.location,
-                      zoom: 16, azimuth: 0, tilt: 0),
-                );
+                _mapController.move(widget.place.latLng, 14.0);
               },
               child: const Icon(Icons.center_focus_strong),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMarker() {
+    return Stack(
+      children: [
+        // Фон маркера
+        Container(
+          decoration: BoxDecoration(
+            color: getCategoryColor(widget.place.type),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+        ),
+        // Иконка категории места
+        Center(
+          child: Icon(
+            widget.place.type.icon,
+            color: Colors.white,
+            size: 30,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:yandex_maps_mapkit/mapkit.dart';
+import 'package:latlong2/latlong.dart';
+
+// Собственный класс для хранения географических координат
+class GeoPoint {
+  final double latitude;
+  final double longitude;
+
+  const GeoPoint({
+    required this.latitude,
+    required this.longitude,
+  });
+
+  // Преобразование в LatLng для flutter_map
+  LatLng toLatLng() => LatLng(latitude, longitude);
+}
 
 class CulturalPlace {
   final String name;
   final String description;
-  final Point location;
+  final GeoPoint location;
   final PlaceType type;
   final String? imageUrl;
   final List<String>? images;
@@ -17,6 +31,9 @@ class CulturalPlace {
     this.imageUrl,
     this.images,
   });
+
+  // Преобразование координат в LatLng для flutter_map
+  LatLng get latLng => location.toLatLng();
 }
 
 enum PlaceType {

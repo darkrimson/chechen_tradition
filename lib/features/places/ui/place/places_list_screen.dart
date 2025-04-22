@@ -3,6 +3,7 @@ import 'package:chechen_tradition/features/places/models/culture_place.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/places/provider/places_provider.dart';
+import 'package:chechen_tradition/features/places/ui/map/places_map_widget.dart';
 import 'place_detail_screen.dart';
 
 class PlacesListScreen extends StatefulWidget {
@@ -16,6 +17,7 @@ class PlacesListScreen extends StatefulWidget {
 
 class _PlacesListScreenState extends State<PlacesListScreen> {
   PlaceType? _selectedFilter;
+  bool _showMapView = false; // По умолчанию показываем список
 
   @override
   void initState() {
@@ -38,6 +40,18 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Список мест'),
+        actions: [
+          // Кнопка переключения между картой и списком
+          IconButton(
+            icon: Icon(_showMapView ? Icons.list : Icons.map),
+            onPressed: () {
+              setState(() {
+                _showMapView = !_showMapView;
+              });
+            },
+            tooltip: _showMapView ? 'Показать список' : 'Показать карту',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -119,110 +133,119 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: placesProvider.getFilteredPlaces().length,
-              itemBuilder: (context, index) {
-                final place = placesProvider.getFilteredPlaces()[index];
-                return Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PlaceDetailScreen(place: place),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          if (place.imageUrl != null)
-                            Hero(
-                              tag: 'place_image_${place.name}',
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: CachedNetworkImage(
-                                  imageUrl: place.imageUrl!,
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => Container(
-                                    color: Colors.grey.shade300,
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  ),
-                                ),
+            child: _showMapView
+                ? PlacesMapWidget(
+                    places: placesProvider.places,
+                    filter: _selectedFilter,
+                  )
+                : ListView.builder(
+                    itemCount: placesProvider.getFilteredPlaces().length,
+                    itemBuilder: (context, index) {
+                      final place = placesProvider.getFilteredPlaces()[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    PlaceDetailScreen(place: place),
                               ),
-                            )
-                          else
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                place.type.icon,
-                                size: 40,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
                               children: [
-                                Text(
-                                  place.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  place.description,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: getCategoryColor(place.type)
-                                        .withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    place.type.label,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: getCategoryColor(place.type),
-                                      fontWeight: FontWeight.bold,
+                                if (place.imageUrl != null)
+                                  Hero(
+                                    tag: 'place_image_${place.name}',
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: CachedNetworkImage(
+                                        imageUrl: place.imageUrl!,
+                                        width: 100,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) =>
+                                            Container(
+                                          color: Colors.grey.shade300,
+                                          child: const Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  Container(
+                                    width: 80,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade200,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      place.type.icon,
+                                      size: 40,
+                                      color: Colors.grey.shade700,
                                     ),
                                   ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        place.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        place.description,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: getCategoryColor(place.type)
+                                              .withOpacity(0.2),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          place.type.label,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: getCategoryColor(place.type),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
+                                const Icon(Icons.arrow_forward_ios, size: 16),
                               ],
                             ),
                           ),
-                          const Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),
