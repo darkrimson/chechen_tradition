@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/traditions/models/tradition.dart';
 import 'package:chechen_tradition/features/traditions/ui/tradition_detail_screen.dart';
@@ -39,10 +40,10 @@ class TraditionsListScreen extends StatelessWidget {
                     label: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.all_inclusive,
-                          size: 30,
-                          color: Colors.black,
+                        SvgPicture.network(
+                          'https://www.svgrepo.com/show/446706/justify-all.svg',
+                          width: 30,
+                          height: 30,
                         ),
                         const SizedBox(height: 4),
                         const Text(
@@ -67,10 +68,10 @@ class TraditionsListScreen extends StatelessWidget {
                           label: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
-                                category.iconPath,
-                                size: 30,
-                                color: Colors.black,
+                              SvgPicture.network(
+                                category.networkSvg,
+                                width: 30,
+                                height: 30,
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -142,10 +143,10 @@ class TraditionsListScreen extends StatelessWidget {
                                       width: 100,
                                       height: 100,
                                       color: Colors.grey.shade300,
-                                      child: Icon(
-                                        tradition.category.iconPath,
-                                        size: 40,
-                                        color: Colors.grey.shade700,
+                                      child: SvgPicture.network(
+                                        tradition.category.networkSvg,
+                                        width: 40,
+                                        height: 40,
                                       ),
                                     );
                                   },

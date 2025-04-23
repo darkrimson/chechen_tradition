@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/traditions/models/tradition.dart';
 import 'package:chechen_tradition/features/traditions/provider/tradition_provider.dart';
@@ -43,9 +44,10 @@ class TraditionDetailScreen extends StatelessWidget {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: Colors.grey.shade300,
-                        child: Icon(
-                          tradition.category.iconPath,
-                          size: 80,
+                        child: SvgPicture.network(
+                          tradition.category.networkSvg,
+                          width: 80,
+                          height: 80,
                           color: Colors.grey.shade700,
                         ),
                       );
@@ -87,9 +89,10 @@ class TraditionDetailScreen extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          tradition.category.iconPath,
-                          size: 16,
+                        SvgPicture.network(
+                          tradition.category.networkSvg,
+                          width: 16,
+                          height: 16,
                           color: _getCategoryColor(tradition.category),
                         ),
                         const SizedBox(width: 4),
@@ -121,16 +124,6 @@ class TraditionDetailScreen extends StatelessWidget {
                                 ? 'Добавлено в избранное'
                                 : 'Удалено из избранного',
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Поделиться'),
                         ),
                       );
                     },
@@ -228,7 +221,8 @@ class TraditionDetailScreen extends StatelessWidget {
                                       color: Colors.grey.shade300,
                                       child: Center(
                                         child: Icon(
-                                          similarTradition.category.iconPath,
+                                          Icons.ice_skating,
+                                          // similarTradition.category.iconPath,
                                           size: 40,
                                           color: Colors.grey.shade700,
                                         ),

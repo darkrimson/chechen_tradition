@@ -37,14 +37,16 @@ class CulturalPlace {
 }
 
 enum PlaceType {
-  museum('Музеи', Icons.museum),
-  monument('Памятники', Icons.monochrome_photos_rounded),
-  nature('Природа', Icons.nature),
-  architecture('Архитектура', Icons.architecture);
+  museum('Музеи', 'https://www.svgrepo.com/show/490879/museum.svg'),
+  monument(
+      'Памятники', 'https://www.svgrepo.com/show/179039/obelisk-monument.svg'),
+  nature('Природа', 'https://www.svgrepo.com/show/476077/mountain.svg'),
+  architecture(
+      'Архитектура', 'https://www.svgrepo.com/show/428234/architecture.svg');
 
   final String label;
-  final IconData icon;
-  const PlaceType(this.label, this.icon);
+  final String networkSvg;
+  const PlaceType(this.label, this.networkSvg);
 }
 
 Color getCategoryColor(PlaceType category) {

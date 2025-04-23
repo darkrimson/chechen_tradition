@@ -2,6 +2,9 @@ import 'package:chechen_tradition/features/places/models/culture_place.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'package:chechen_tradition/features/places/provider/places_provider.dart';
 import '../map/map_screen.dart';
 
 class PlaceDetailScreen extends StatefulWidget {
@@ -21,10 +24,15 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
     // Получаем фактическое количество изображений
     int imagesCount = widget.place.images?.length ?? 0;
 
+    // Получаем провайдер для работы с избранным
+    final placesProvider = Provider.of<PlacesProvider>(context);
+    final isFavorite = placesProvider.isFavorite(widget.place.name);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.place.name),
         actions: [
+          // Кнопка открытия карты
           IconButton(
             icon: const Icon(Icons.map),
             tooltip: 'Показать на карте',
@@ -75,9 +83,10 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                 width: double.infinity,
                 height: 250,
                 color: Colors.grey.shade200,
-                child: Icon(
-                  widget.place.type.icon,
-                  size: 100,
+                child: SvgPicture.network(
+                  widget.place.type.networkSvg,
+                  width: 100,
+                  height: 100,
                   color: Colors.grey.shade400,
                 ),
               ),
@@ -86,33 +95,73 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color:
-                          getCategoryColor(widget.place.type).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          widget.place.type.icon,
-                          color: getCategoryColor(widget.place.type),
-                          size: 18,
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: getCategoryColor(widget.place.type)
+                              .withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          widget.place.type.label,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SvgPicture.network(
+                              widget.place.type.networkSvg,
+                              width: 18,
+                              height: 18,
+                              color: getCategoryColor(widget.place.type),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              widget.place.type.label,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
                                     color: getCategoryColor(widget.place.type),
                                     fontWeight: FontWeight.bold,
                                   ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : null,
+                        ),
+                        tooltip: isFavorite
+                            ? 'Удалить из избранного'
+                            : 'Добавить в избранное',
+                        onPressed: () {
+                          placesProvider.toggleFavorite(widget.place.name);
+
+                          // Показываем уведомление о действии
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                isFavorite
+                                    ? 'Удалено из избранного'
+                                    : 'Добавлено в избранное',
+                              ),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                              action: SnackBarAction(
+                                label: 'OK',
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context)
+                                      .hideCurrentSnackBar();
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   Text(

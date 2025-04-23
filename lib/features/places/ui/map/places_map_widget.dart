@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:chechen_tradition/features/places/models/culture_place.dart';
 import 'package:chechen_tradition/features/places/ui/place/place_detail_screen.dart';
@@ -94,10 +95,11 @@ class PlacesMapWidget extends StatelessWidget {
         ),
         // Иконка категории места
         Center(
-          child: Icon(
-            place.type.icon,
+          child: SvgPicture.network(
+            place.type.networkSvg,
+            width: 20,
+            height: 20,
             color: Colors.white,
-            size: 20,
           ),
         ),
       ],

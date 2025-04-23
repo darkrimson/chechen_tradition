@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chechen_tradition/features/places/models/culture_place.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/places/provider/places_provider.dart';
 import 'package:chechen_tradition/features/places/ui/map/places_map_widget.dart';
@@ -64,12 +65,17 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                   label: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.all_out,
-                        size: 30,
-                        color: _selectedFilter == null
-                            ? Colors.black
-                            : Colors.black,
+                      // Icon(
+                      //   Icons.all_out,
+                      //   size: 30,
+                      //   color: _selectedFilter == null
+                      //       ? Colors.black
+                      //       : Colors.black,
+                      // ),
+                      SvgPicture.network(
+                        'https://www.svgrepo.com/show/446706/justify-all.svg',
+                        width: 30,
+                        height: 30,
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -99,12 +105,10 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                         label: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              type.icon,
-                              size: 30,
-                              color: _selectedFilter == type
-                                  ? Colors.black
-                                  : Colors.black,
+                            SvgPicture.network(
+                              type.networkSvg,
+                              width: 30,
+                              height: 30,
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -142,6 +146,9 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                     itemCount: placesProvider.getFilteredPlaces().length,
                     itemBuilder: (context, index) {
                       final place = placesProvider.getFilteredPlaces()[index];
+                      // Проверяем, находится ли место в избранном
+                      final isFavorite = placesProvider.isFavorite(place.name);
+
                       return Card(
                         margin: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
@@ -187,10 +194,10 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                                       color: Colors.grey.shade200,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: Icon(
-                                      place.type.icon,
-                                      size: 40,
-                                      color: Colors.grey.shade700,
+                                    child: SvgPicture.network(
+                                      place.type.networkSvg,
+                                      width: 40,
+                                      height: 40,
                                     ),
                                   ),
                                 const SizedBox(width: 16),
@@ -235,6 +242,27 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                                           ),
                                         ),
                                       ),
+                                      // Отображаем индикатор избранного, если место в избранном
+                                      if (isFavorite) ...[
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.favorite,
+                                              color: Colors.red,
+                                              size: 16,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              'В избранном',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 ),

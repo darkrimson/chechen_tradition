@@ -21,14 +21,16 @@ class Tradition {
 }
 
 enum TraditionCategory {
-  clothing('Одежда', Icons.person),
-  cuisine('Кухня', Icons.restaurant),
-  crafts('Ремесла', Icons.handshake),
-  holidays('Праздники', Icons.holiday_village);
+  clothing('Одежда', 'https://www.svgrepo.com/show/482520/clothes-hanger.svg'),
+  cuisine('Кухня', 'https://www.svgrepo.com/show/490738/food-restaurant.svg'),
+  crafts('Ремесла',
+      'https://www.svgrepo.com/show/425780/craft-knitting-tailor.svg'),
+  holidays(
+      'Праздники', 'https://www.svgrepo.com/show/452246/calendar-marked.svg');
 
   final String label;
-  final IconData iconPath;
-  const TraditionCategory(this.label, this.iconPath);
+  final String networkSvg;
+  const TraditionCategory(this.label, this.networkSvg);
 }
 
 Color getCategoryColor(TraditionCategory category) {

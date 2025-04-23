@@ -1,6 +1,7 @@
 import 'package:chechen_tradition/features/places/models/culture_place.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class MapScreen extends StatefulWidget {
   final CulturalPlace place;
@@ -86,10 +87,11 @@ class _MapScreenState extends State<MapScreen> {
         ),
         // Иконка категории места
         Center(
-          child: Icon(
-            widget.place.type.icon,
+          child: SvgPicture.network(
+            widget.place.type.networkSvg,
+            width: 30,
+            height: 30,
             color: Colors.white,
-            size: 30,
           ),
         ),
       ],
