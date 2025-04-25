@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/places/provider/places_provider.dart';
 import 'package:chechen_tradition/features/places/ui/map/places_map_widget.dart';
+import 'package:chechen_tradition/common/ui/favorites_screen.dart';
 import 'place_detail_screen.dart';
 
 class PlacesListScreen extends StatefulWidget {
@@ -42,6 +43,20 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
       appBar: AppBar(
         title: const Text('Список мест'),
         actions: [
+          // Кнопка для перехода на экран избранного
+          IconButton(
+            icon: const Icon(Icons.favorite),
+            tooltip: 'Избранное',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const FavoritesScreen(type: FavoriteType.places),
+                ),
+              );
+            },
+          ),
           // Кнопка переключения между картой и списком
           IconButton(
             icon: Icon(_showMapView ? Icons.list : Icons.map),

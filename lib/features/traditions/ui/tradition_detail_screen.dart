@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/traditions/models/tradition.dart';
 import 'package:chechen_tradition/features/traditions/provider/tradition_provider.dart';
+import 'package:chechen_tradition/common/ui/favorites_screen.dart';
 
 class TraditionDetailScreen extends StatelessWidget {
   final Tradition tradition;
@@ -13,168 +15,178 @@ class TraditionDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Получаем провайдер традиций
     final traditionProvider = Provider.of<TraditionProvider>(context);
+    final isFavorite = tradition.isLiked;
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          // Заголовок с изображением
-          SliverAppBar(
-            expandedHeight: 240.0,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                tradition.title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(
-                      blurRadius: 4.0,
-                      color: Colors.black54,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
+      appBar: AppBar(
+        title: Text(tradition.title),
+        actions: [
+          // Кнопка для перехода на экран избранного
+          IconButton(
+            icon: const Icon(Icons.favorite),
+            tooltip: 'Избранное',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const FavoritesScreen(type: FavoriteType.traditions),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Главное изображение
+            CachedNetworkImage(
+              imageUrl: tradition.imageUrl,
+              width: double.infinity,
+              height: 250,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                color: Colors.grey.shade300,
+                height: 250,
+                child: const Center(
+                  child: CircularProgressIndicator(),
                 ),
               ),
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(
-                    tradition.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey.shade300,
-                        child: SvgPicture.network(
-                          tradition.category.networkSvg,
-                          width: 80,
-                          height: 80,
-                          color: Colors.grey.shade700,
-                        ),
-                      );
-                    },
+              errorWidget: (context, url, stackTrace) {
+                return Container(
+                  width: double.infinity,
+                  height: 250,
+                  color: Colors.grey.shade300,
+                  child: SvgPicture.network(
+                    tradition.category.networkSvg,
+                    width: 100,
+                    height: 100,
+                    color: Colors.grey.shade400,
                   ),
-                  // Затемнение для лучшей читаемости
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.7),
-                        ],
-                        stops: const [0.7, 1.0],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-          ),
-
-          // Метка категории
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Row(
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: _getCategoryColor(tradition.category)
-                          .withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SvgPicture.network(
-                          tradition.category.networkSvg,
-                          width: 16,
-                          height: 16,
-                          color: _getCategoryColor(tradition.category),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          tradition.category.label,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: _getCategoryColor(tradition.category),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: Icon(
-                      tradition.isLiked
-                          ? Icons.favorite
-                          : Icons.favorite_border,
-                      color: tradition.isLiked ? Colors.red : null,
-                    ),
-                    onPressed: () async {
-                      // Используем провайдер для переключения избранного
-                      await traditionProvider.toggleFavorite(tradition.id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            tradition.isLiked
-                                ? 'Добавлено в избранное'
-                                : 'Удалено из избранного',
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Описание
-          SliverToBoxAdapter(
-            child: Padding(
+            Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Описание
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: getCategoryColor(tradition.category)
+                              .withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SvgPicture.network(
+                              tradition.category.networkSvg,
+                              width: 18,
+                              height: 18,
+                              color: getCategoryColor(tradition.category),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              tradition.category.label,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: getCategoryColor(tradition.category),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : null,
+                        ),
+                        tooltip: isFavorite
+                            ? 'Удалить из избранного'
+                            : 'Добавить в избранное',
+                        onPressed: () async {
+                          await traditionProvider.toggleFavorite(tradition.id);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                isFavorite
+                                    ? 'Удалено из избранного'
+                                    : 'Добавлено в избранное',
+                              ),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                              action: SnackBarAction(
+                                label: 'OK',
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context)
+                                      .hideCurrentSnackBar();
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    tradition.title,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Описание',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     tradition.description,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     tradition.content,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 1.5,
-                    ),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          height: 1.5,
+                        ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Заголовок рекомендаций
+                  const Divider(),
+                  const SizedBox(height: 16),
                   const Text(
                     'Похожие традиции',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
-          ),
-
-          // Похожие традиции
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 220,
+            SizedBox(
+              height: 300,
               child: Consumer<TraditionProvider>(
                 builder: (context, provider, child) {
                   // Получаем другие традиции той же категории
@@ -186,7 +198,7 @@ class TraditionDetailScreen extends StatelessWidget {
                       .toList();
 
                   return ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     scrollDirection: Axis.horizontal,
                     itemCount: similarTraditions.length,
                     itemBuilder: (context, index) {
@@ -209,23 +221,28 @@ class TraditionDetailScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.asset(
-                                  similarTradition.imageUrl,
+                                borderRadius: BorderRadius.circular(12),
+                                child: CachedNetworkImage(
+                                  imageUrl: similarTradition.imageUrl,
                                   height: 120,
                                   width: 160,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
+                                  placeholder: (context, url) => Container(
+                                    color: Colors.grey.shade300,
+                                    height: 120,
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
+                                  errorWidget: (context, error, stackTrace) {
                                     return Container(
                                       height: 120,
                                       color: Colors.grey.shade300,
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.ice_skating,
-                                          // similarTradition.category.iconPath,
-                                          size: 40,
-                                          color: Colors.grey.shade700,
-                                        ),
+                                      child: SvgPicture.network(
+                                        similarTradition.category.networkSvg,
+                                        width: 40,
+                                        height: 40,
+                                        color: Colors.grey.shade700,
                                       ),
                                     );
                                   },
@@ -251,6 +268,27 @@ class TraditionDetailScreen extends StatelessWidget {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
+                              // Показываем статус избранного
+                              if (similarTradition.isLiked) ...[
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.favorite,
+                                      color: Colors.red,
+                                      size: 14,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'В избранном',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -260,27 +298,10 @@ class TraditionDetailScreen extends StatelessWidget {
                 },
               ),
             ),
-          ),
-
-          // Пространство внизу страницы
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 32),
-          ),
-        ],
+            const SizedBox(height: 30),
+          ],
+        ),
       ),
     );
-  }
-
-  Color _getCategoryColor(TraditionCategory category) {
-    switch (category) {
-      case TraditionCategory.clothing:
-        return Colors.blue;
-      case TraditionCategory.cuisine:
-        return Colors.orange;
-      case TraditionCategory.crafts:
-        return Colors.amber.shade800;
-      case TraditionCategory.holidays:
-        return Colors.green;
-    }
   }
 }

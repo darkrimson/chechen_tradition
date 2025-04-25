@@ -107,4 +107,11 @@ class PlacesProvider with ChangeNotifier {
       return null;
     }
   }
+
+  // Метод для получения списка всех избранных мест
+  List<CulturalPlace> getFavoritePlaces() {
+    return places
+        .where((place) => _favoritePlaceNames.contains(place.name))
+        .toList();
+  }
 }

@@ -239,14 +239,14 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                                         horizontal: 5.0),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.2),
-                                          spreadRadius: 1,
-                                          blurRadius: 5,
-                                          offset: const Offset(0, 3),
-                                        ),
-                                      ],
+                                      // boxShadow: [
+                                      //   BoxShadow(
+                                      //     color: Colors.black.withOpacity(0.2),
+                                      //     spreadRadius: 1,
+                                      //     blurRadius: 5,
+                                      //     offset: const Offset(0, 3),
+                                      //   ),
+                                      // ],
                                     ),
                                     child: Stack(
                                       children: [

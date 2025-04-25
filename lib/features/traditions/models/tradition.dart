@@ -26,7 +26,7 @@ enum TraditionCategory {
   crafts('Ремесла',
       'https://www.svgrepo.com/show/425780/craft-knitting-tailor.svg'),
   holidays(
-      'Праздники', 'https://www.svgrepo.com/show/452246/calendar-marked.svg');
+      'События', 'https://www.svgrepo.com/show/452246/calendar-marked.svg');
 
   final String label;
   final String networkSvg;

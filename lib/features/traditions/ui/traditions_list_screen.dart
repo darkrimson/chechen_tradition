@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/traditions/models/tradition.dart';
 import 'package:chechen_tradition/features/traditions/ui/tradition_detail_screen.dart';
 import 'package:chechen_tradition/features/traditions/provider/tradition_provider.dart';
+import 'package:chechen_tradition/common/ui/favorites_screen.dart';
 
 class TraditionsListScreen extends StatelessWidget {
   final TraditionCategory? initialFilter;
@@ -25,6 +27,22 @@ class TraditionsListScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Традиции и обычаи'),
+        actions: [
+          // Кнопка для перехода на экран избранного
+          IconButton(
+            icon: const Icon(Icons.favorite),
+            tooltip: 'Избранное',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const FavoritesScreen(type: FavoriteType.traditions),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -127,18 +145,18 @@ class TraditionsListScreen extends StatelessWidget {
                           );
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(8.0),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: Image.asset(
-                                  tradition.imageUrl,
-                                  width: 80,
-                                  height: 80,
+                                child: CachedNetworkImage(
+                                  imageUrl: tradition.imageUrl,
+                                  width: 100,
+                                  height: 100,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
+                                  errorWidget: (context, error, stackTrace) {
                                     return Container(
                                       width: 100,
                                       height: 100,

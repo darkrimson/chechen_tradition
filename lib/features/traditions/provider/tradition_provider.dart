@@ -31,6 +31,11 @@ class TraditionProvider with ChangeNotifier {
         .toList();
   }
 
+  // Метод для получения списка всех избранных традиций
+  List<Tradition> getFavoriteTraditions() {
+    return traditions.where((tradition) => tradition.isLiked).toList();
+  }
+
   // Инициализация данных
   Future<void> _initTraditions() async {
     // Загрузка мок-данных
