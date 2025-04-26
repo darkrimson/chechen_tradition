@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chechen_tradition/data/education/mock_education.dart';
 import 'package:chechen_tradition/features/education/ui/education/education_detail_screen.dart';
 import 'package:flutter/material.dart';
@@ -33,9 +34,9 @@ class _EducationScreenState extends State<EducationScreen>
       appBar: AppBar(
         title: const Text('Обучение'),
         bottom: TabBar(
-          controller: _tabController,
-          labelColor: Theme.of(context).primaryColor,
+          labelColor: Colors.white,
           unselectedLabelColor: Colors.grey,
+          controller: _tabController,
           tabs: const [
             Tab(text: 'Материалы'),
             Tab(text: 'Тесты'),
@@ -105,8 +106,8 @@ class ContentCard extends StatelessWidget {
                   const BorderRadius.vertical(top: Radius.circular(15)),
               child: Hero(
                 tag: 'content-${content.id}',
-                child: Image.asset(
-                  content.imageUrl,
+                child: CachedNetworkImage(
+                  imageUrl: content.imageUrl,
                   height: 150,
                   width: double.infinity,
                   fit: BoxFit.cover,

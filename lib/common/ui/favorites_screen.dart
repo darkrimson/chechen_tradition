@@ -132,7 +132,7 @@ class FavoritesScreen extends StatelessWidget {
                   child: CachedNetworkImage(
                     imageUrl: place.imageUrl!,
                     width: 100,
-                    height: 100,
+                    height: 120,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Container(
                       color: Colors.grey.shade300,
@@ -197,6 +197,8 @@ class FavoritesScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    // Отображаем индикатор избранного, если место в избранном
+
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -213,32 +215,12 @@ class FavoritesScreen extends StatelessWidget {
                             color: Colors.red,
                           ),
                         ),
-                        const Spacer(),
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 18),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: () {
-                            provider.toggleFavorite(place.name);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text('Удалено из избранного'),
-                                duration: const Duration(seconds: 2),
-                                action: SnackBarAction(
-                                  label: 'Отменить',
-                                  onPressed: () {
-                                    provider.toggleFavorite(place.name);
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                        ),
                       ],
                     ),
                   ],
                 ),
               ),
+              const Icon(Icons.arrow_forward_ios, size: 16),
             ],
           ),
         ),
@@ -271,7 +253,7 @@ class FavoritesScreen extends StatelessWidget {
                 child: CachedNetworkImage(
                   imageUrl: tradition.imageUrl,
                   width: 100,
-                  height: 100,
+                  height: 120,
                   fit: BoxFit.cover,
                   errorWidget: (context, error, stackTrace) {
                     return Container(
@@ -329,45 +311,26 @@ class FavoritesScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.favorite,
-                          color: Colors.red,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'В избранном',
-                          style: TextStyle(
-                            fontSize: 12,
+                    if (tradition.isLiked) ...[
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.favorite,
                             color: Colors.red,
+                            size: 16,
                           ),
-                        ),
-                        const Spacer(),
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 18),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: () {
-                            provider.toggleFavorite(tradition.id);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text('Удалено из избранного'),
-                                duration: const Duration(seconds: 2),
-                                action: SnackBarAction(
-                                  label: 'Отменить',
-                                  onPressed: () {
-                                    provider.toggleFavorite(tradition.id);
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'В избранном',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),

@@ -40,7 +40,7 @@ Color getCategoryColor(TraditionCategory category) {
     case TraditionCategory.cuisine:
       return Colors.orange;
     case TraditionCategory.crafts:
-      return Colors.amber.shade800;
+      return Colors.red;
     case TraditionCategory.holidays:
       return Colors.green;
   }

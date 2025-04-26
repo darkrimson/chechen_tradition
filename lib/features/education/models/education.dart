@@ -4,11 +4,13 @@ class EducationalContent {
   final String description;
   final String? content;
   final String imageUrl;
+  final List<String> images;
   final List<Question> questions;
   final bool isCompleted;
   final double progress;
 
   EducationalContent({
+    required this.images,
     required this.id,
     required this.title,
     required this.description,

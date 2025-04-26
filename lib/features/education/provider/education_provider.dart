@@ -90,6 +90,7 @@ class EducationProvider with ChangeNotifier {
         final progress = _progressMap[content.id] ?? 0.0;
         content = EducationalContent(
           id: content.id,
+          images: content.images,
           title: content.title,
           description: content.description,
           content: content.content,
@@ -166,6 +167,7 @@ class EducationProvider with ChangeNotifier {
       // Обновляем прогресс в объекте контента
       _educationalContent[contentIndex] = EducationalContent(
         id: content.id,
+        images: content.images,
         title: content.title,
         description: content.description,
         content: content.content,
@@ -198,6 +200,7 @@ class EducationProvider with ChangeNotifier {
       // Обновляем объект с нулевым прогрессом
       _educationalContent[contentIndex] = EducationalContent(
         id: content.id,
+        images: content.images,
         title: content.title,
         description: content.description,
         content: content.content,

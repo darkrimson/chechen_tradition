@@ -20,22 +20,6 @@ class TraditionDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(tradition.title),
-        actions: [
-          // Кнопка для перехода на экран избранного
-          IconButton(
-            icon: const Icon(Icons.favorite),
-            tooltip: 'Избранное',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      const FavoritesScreen(type: FavoriteType.traditions),
-                ),
-              );
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -171,7 +155,6 @@ class TraditionDetailScreen extends StatelessWidget {
                           height: 1.5,
                         ),
                   ),
-                  const SizedBox(height: 24),
                   const Divider(),
                   const SizedBox(height: 16),
                   const Text(
@@ -298,7 +281,7 @@ class TraditionDetailScreen extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
           ],
         ),
       ),

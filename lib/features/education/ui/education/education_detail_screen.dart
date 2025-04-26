@@ -19,13 +19,6 @@ class ContentDetailScreen extends StatefulWidget {
 class _ContentDetailScreenState extends State<ContentDetailScreen> {
   int _currentImageIndex = 0;
 
-  // Временные ссылки для демонстрации (будут заменены реальными)
-  final List<String> demoImages = [
-    'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%201',
-    'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%202',
-    'https://placeholder.pics/svg/400x300/DEDEDE/555555/Фото%203',
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,8 +31,8 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
           children: [
             Hero(
               tag: 'content-${widget.content.id}',
-              child: Image.asset(
-                widget.content.imageUrl,
+              child: CachedNetworkImage(
+                imageUrl: widget.content.imageUrl,
                 height: 250,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -97,7 +90,7 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
                         ),
                       ),
                       Text(
-                        '${_currentImageIndex + 1}/${demoImages.length}',
+                        '${_currentImageIndex + 1}/${widget.content.images.length}',
                         style: TextStyle(
                           color: Colors.grey.shade700,
                           fontWeight: FontWeight.bold,
@@ -122,13 +115,13 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
                         });
                       },
                     ),
-                    items: demoImages.map((imageUrl) {
+                    items: widget.content.images.map((imageUrl) {
                       return Builder(
                         builder: (BuildContext context) {
                           return GestureDetector(
                             onTap: () {
                               _showFullScreenImage(
-                                  context, imageUrl, demoImages);
+                                  context, imageUrl, widget.content.images);
                             },
                             child: Container(
                               width: MediaQuery.of(context).size.width,
@@ -136,14 +129,6 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
                                   const EdgeInsets.symmetric(horizontal: 5.0),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    spreadRadius: 1,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
                               ),
                               child: Stack(
                                 children: [
@@ -209,7 +194,8 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: demoImages.asMap().entries.map((entry) {
+                    children:
+                        widget.content.images.asMap().entries.map((entry) {
                       return Container(
                         width: 8.0,
                         height: 8.0,

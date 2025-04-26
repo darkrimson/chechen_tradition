@@ -1,4 +1,4 @@
-import 'package:chechen_tradition/features/education/ui/education/education_screen.dart';
+import 'package:chechen_tradition/features/education/ui/education/education_list_screen.dart';
 import 'package:chechen_tradition/features/main/home/ui/home_screen.dart';
 import 'package:chechen_tradition/features/places/ui/place/places_list_screen.dart';
 import 'package:chechen_tradition/features/traditions/ui/traditions_list_screen.dart';

@@ -56,8 +56,8 @@ Color getCategoryColor(PlaceType category) {
     case PlaceType.monument:
       return Colors.orange;
     case PlaceType.nature:
-      return Colors.amber.shade800;
-    case PlaceType.architecture:
       return Colors.green;
+    case PlaceType.architecture:
+      return Colors.red;
   }
 }

@@ -154,7 +154,7 @@ class TraditionsListScreen extends StatelessWidget {
                                 child: CachedNetworkImage(
                                   imageUrl: tradition.imageUrl,
                                   width: 100,
-                                  height: 100,
+                                  height: 120,
                                   fit: BoxFit.cover,
                                   errorWidget: (context, error, stackTrace) {
                                     return Container(
@@ -235,7 +235,6 @@ class TraditionsListScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              const Icon(Icons.arrow_forward_ios, size: 16),
                             ],
                           ),
                         ),

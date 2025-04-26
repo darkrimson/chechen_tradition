@@ -1,5 +1,7 @@
+import 'package:chechen_tradition/data/event_items/mock_event_items.dart';
 import 'package:chechen_tradition/data/places/mock_places.dart';
 import 'package:chechen_tradition/data/traditions/mock_traditions.dart';
+import 'package:chechen_tradition/features/main/home/models/event_item.dart';
 import 'package:chechen_tradition/features/main/settings/ui/settings_screen.dart';
 import 'package:chechen_tradition/features/main/search/ui/search_page.dart';
 import 'package:chechen_tradition/features/places/ui/place/place_detail_screen.dart';
@@ -18,45 +20,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Модель события
-  final List<EventItem> _events = [
-    EventItem(
-      title: 'День чеченского языка',
-      description: 'Ежегодный праздник, посвященный чеченскому языку',
-      date: '25 апреля',
-      imageUrl: 'assets/images/chechen_language.jpg',
-      color: Colors.indigo.shade300,
-    ),
-    EventItem(
-      title: 'Фестиваль культуры',
-      description: 'Традиционный фестиваль чеченской культуры в Грозном',
-      date: '10 мая',
-      imageUrl: 'assets/images/festival.jpg',
-      color: Colors.orange.shade300,
-    ),
-    EventItem(
-      title: 'Выставка ремесел',
-      description: 'Выставка традиционных чеченских ремесел и мастер-классы',
-      date: '15 июня',
-      imageUrl: 'assets/images/crafts.jpg',
-      color: Colors.teal.shade300,
-    ),
-    EventItem(
-      title: 'Исторический форум',
-      description: 'Международный форум по истории Северного Кавказа',
-      date: '20 июля',
-      imageUrl: 'assets/images/history.jpg',
-      color: Colors.purple.shade300,
-    ),
-    EventItem(
-      title: 'Этнический концерт',
-      description: 'Концерт традиционной чеченской музыки',
-      date: '5 августа',
-      imageUrl: 'assets/images/music.jpg',
-      color: Colors.deepOrange.shade300,
-    ),
-  ];
-
   // Текущий индекс карусели
   int _currentCarouselIndex = 0;
 
@@ -138,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(
                     height: 220,
                     child: PageView.builder(
-                      itemCount: _events.length,
+                      itemCount: events.length,
                       controller: PageController(viewportFraction: 0.9),
                       onPageChanged: (index) {
                         setState(() {
@@ -146,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         });
                       },
                       itemBuilder: (context, index) {
-                        return _buildEventCard(_events[index]);
+                        return _buildEventCard(events[index]);
                       },
                     ),
                   ),
@@ -154,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      _events.length,
+                      events.length,
                       (index) => Container(
                         width: 8,
                         height: 8,
@@ -343,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Метод для создания карточки события
   Widget _buildEventCard(EventItem event) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8.0),
       child: Card(
         elevation: 4,
         shape: RoundedRectangleBorder(
@@ -544,21 +507,4 @@ class _HomeScreenState extends State<HomeScreen> {
         break;
     }
   }
-}
-
-// Модель для событий
-class EventItem {
-  final String title;
-  final String description;
-  final String date;
-  final String imageUrl;
-  final Color color;
-
-  EventItem({
-    required this.title,
-    required this.description,
-    required this.date,
-    required this.imageUrl,
-    required this.color,
-  });
 }

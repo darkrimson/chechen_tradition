@@ -180,6 +180,7 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 if (place.imageUrl != null)
                                   Hero(
@@ -189,7 +190,7 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                                       child: CachedNetworkImage(
                                         imageUrl: place.imageUrl!,
                                         width: 100,
-                                        height: 100,
+                                        height: 120,
                                         fit: BoxFit.cover,
                                         placeholder: (context, url) =>
                                             Container(
@@ -238,7 +239,7 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                                           color: Colors.black87,
                                         ),
                                       ),
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: 6),
                                       Container(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8, vertical: 2),
@@ -281,7 +282,6 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                                     ],
                                   ),
                                 ),
-                                const Icon(Icons.arrow_forward_ios, size: 16),
                               ],
                             ),
                           ),
