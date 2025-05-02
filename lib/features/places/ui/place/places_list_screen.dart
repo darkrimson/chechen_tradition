@@ -182,40 +182,24 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (place.imageUrl != null)
-                                  Hero(
-                                    tag: 'place_image_${place.name}',
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: CachedNetworkImage(
-                                        imageUrl: place.imageUrl!,
-                                        width: 100,
-                                        height: 120,
-                                        fit: BoxFit.cover,
-                                        placeholder: (context, url) =>
-                                            Container(
-                                          color: Colors.grey.shade300,
-                                          child: const Center(
-                                            child: CircularProgressIndicator(),
-                                          ),
+                                Hero(
+                                  tag: 'place_image_${place.name}',
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: CachedNetworkImage(
+                                      imageUrl: place.imageUrl,
+                                      width: 100,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Container(
+                                        color: Colors.grey.shade300,
+                                        child: const Center(
+                                          child: CircularProgressIndicator(),
                                         ),
                                       ),
                                     ),
-                                  )
-                                else
-                                  Container(
-                                    width: 80,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade200,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: SvgPicture.network(
-                                      place.type.networkSvg,
-                                      width: 40,
-                                      height: 40,
-                                    ),
                                   ),
+                                ),
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: Column(

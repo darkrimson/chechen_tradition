@@ -51,45 +51,32 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.place.imageUrl != null)
-              Hero(
-                tag: 'place_image_${widget.place.name}',
-                child: CachedNetworkImage(
-                  imageUrl: widget.place.imageUrl!,
-                  width: double.infinity,
-                  height: 250,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey.shade300,
-                    height: 250,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
-                  errorWidget: (context, error, stackTrace) {
-                    return Container(
-                      width: double.infinity,
-                      height: 250,
-                      color: Colors.grey.shade300,
-                      child: const Center(
-                        child: Icon(Icons.image_not_supported, size: 50),
-                      ),
-                    );
-                  },
-                ),
-              )
-            else
-              Container(
+            Hero(
+              tag: 'place_image_${widget.place.name}',
+              child: CachedNetworkImage(
+                imageUrl: widget.place.imageUrl,
                 width: double.infinity,
                 height: 250,
-                color: Colors.grey.shade200,
-                child: SvgPicture.network(
-                  widget.place.type.networkSvg,
-                  width: 100,
-                  height: 100,
-                  color: Colors.grey.shade400,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: Colors.grey.shade300,
+                  height: 250,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 ),
+                errorWidget: (context, error, stackTrace) {
+                  return Container(
+                    width: double.infinity,
+                    height: 250,
+                    color: Colors.grey.shade300,
+                    child: const Center(
+                      child: Icon(Icons.image_not_supported, size: 50),
+                    ),
+                  );
+                },
               ),
+            ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(

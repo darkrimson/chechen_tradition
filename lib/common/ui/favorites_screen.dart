@@ -126,36 +126,21 @@ class FavoritesScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Row(
             children: [
-              if (place.imageUrl != null)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: CachedNetworkImage(
-                    imageUrl: place.imageUrl!,
-                    width: 100,
-                    height: 120,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: Colors.grey.shade300,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: CachedNetworkImage(
+                  imageUrl: place.imageUrl,
+                  width: 100,
+                  height: 120,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey.shade300,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
                     ),
                   ),
-                )
-              else
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: SvgPicture.network(
-                    place.type.networkSvg,
-                    width: 40,
-                    height: 40,
-                  ),
                 ),
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(

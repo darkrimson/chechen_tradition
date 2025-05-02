@@ -1,6 +1,5 @@
 // lib/models/search_item.dart
 import 'package:chechen_tradition/features/education/models/education.dart';
-import 'package:chechen_tradition/features/education/models/question.dart';
 import 'package:chechen_tradition/features/places/models/culture_place.dart';
 import 'package:chechen_tradition/features/traditions/models/tradition.dart';
 

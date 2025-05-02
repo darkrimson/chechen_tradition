@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/traditions/models/tradition.dart';
 import 'package:chechen_tradition/features/traditions/provider/tradition_provider.dart';
-import 'package:chechen_tradition/common/ui/favorites_screen.dart';
 
 class TraditionDetailScreen extends StatelessWidget {
   final Tradition tradition;
