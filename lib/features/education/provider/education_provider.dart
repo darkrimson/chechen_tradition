@@ -1,24 +1,26 @@
 import 'dart:convert';
+import 'package:chechen_tradition/features/education/models/question.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:chechen_tradition/data/education/mock_education.dart';
 import 'package:chechen_tradition/features/education/models/education.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EducationProvider with ChangeNotifier {
-  List<EducationalContent> _educationalContent = [];
-  Map<String, double> _progressMap = {}; // ID контента -> прогресс (0.0-1.0)
-  Map<String, List<String>> _answeredQuestions =
+  final List<Education> _educationalContent = [];
+  final Map<String, double> _progressMap =
+      {}; // ID контента -> прогресс (0.0-1.0)
+  final Map<String, List<String>> _answeredQuestions =
       {}; // ID контента -> список ID отвеченных вопросов
 
   EducationProvider() {
-    _initEducation();
+    loadEducationData();
   }
 
   // Геттеры
-  List<EducationalContent> get educationalContent => _educationalContent;
+  List<Education> get educationalContent => _educationalContent;
 
   // Получение контента по ID
-  EducationalContent? getContentById(String id) {
+  Education? getContentById(String id) {
     try {
       return _educationalContent.firstWhere((item) => item.id == id);
     } catch (e) {
@@ -27,43 +29,36 @@ class EducationProvider with ChangeNotifier {
   }
 
   // Инициализация данных
-  Future<void> _initEducation() async {
-    // Загрузка мок-данных
-    _educationalContent = List.from(mockEducationalContent);
+  Future<void> loadEducationData() async {
+    final supabase = Supabase.instance.client;
 
-    // Загрузка прогресса обучения
-    await _loadProgress();
+    // 1. Получаем все материалы
+    final educationRes = await supabase.from('education').select('*');
 
-    // Обновление прогресса для всех материалов
-    _updateProgress();
+    // 2. Получаем все вопросы
+    final questionsRes = await supabase.from('question').select('*');
+
+    // 3. Группируем вопросы по education_id
+    final Map<String, List<Question>> questionMap = {};
+    for (var item in questionsRes) {
+      final question = Question.fromMap(item);
+      final educationId = item['id'];
+      if (!questionMap.containsKey(educationId)) {
+        questionMap[educationId] = [];
+      }
+      questionMap[educationId]!.add(question);
+    }
+
+    _educationalContent.clear();
+
+    // 4. Собираем все в Education
+    for (var item in educationRes) {
+      final questions = questionMap[item['id']] ?? [];
+      final education = Education.fromMap(item, questions);
+      _educationalContent.add(education);
+    }
 
     notifyListeners();
-  }
-
-  // Загрузка прогресса из SharedPreferences
-  Future<void> _loadProgress() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-
-      // Загрузка общего прогресса
-      final String? progressJson = prefs.getString('education_progress');
-      if (progressJson != null) {
-        final Map<String, dynamic> progressData = jsonDecode(progressJson);
-        _progressMap = Map<String, double>.from(
-            progressData.map((key, value) => MapEntry(key, value as double)));
-      }
-
-      // Загрузка отвеченных вопросов
-      final String? answeredJson =
-          prefs.getString('education_answered_questions');
-      if (answeredJson != null) {
-        final Map<String, dynamic> answeredData = jsonDecode(answeredJson);
-        _answeredQuestions = Map<String, List<String>>.from(answeredData
-            .map((key, value) => MapEntry(key, List<String>.from(value))));
-      }
-    } catch (e) {
-      debugPrint('Ошибка при загрузке прогресса обучения: $e');
-    }
   }
 
   // Сохранение прогресса в SharedPreferences
@@ -83,35 +78,6 @@ class EducationProvider with ChangeNotifier {
   }
 
   // Обновление статуса прогресса для всех образовательных материалов
-  void _updateProgress() {
-    for (var content in _educationalContent) {
-      // Установка прогресса из сохраненных данных
-      if (_progressMap.containsKey(content.id)) {
-        final progress = _progressMap[content.id] ?? 0.0;
-        content = EducationalContent(
-          id: content.id,
-          images: content.images,
-          title: content.title,
-          description: content.description,
-          content: content.content,
-          imageUrl: content.imageUrl,
-          questions: content.questions,
-          progress: progress,
-          isCompleted: progress >= 1.0,
-        );
-      }
-
-      // Обновление статуса ответов на вопросы
-      if (_answeredQuestions.containsKey(content.id)) {
-        final answeredIds = _answeredQuestions[content.id] ?? [];
-        for (var question in content.questions) {
-          if (answeredIds.contains(question.id)) {
-            question.isAnswered = true;
-          }
-        }
-      }
-    }
-  }
 
   // Сохранение ответа на вопрос
   Future<void> saveQuestionAnswer(
@@ -165,7 +131,7 @@ class EducationProvider with ChangeNotifier {
       _progressMap[contentId] = progress;
 
       // Обновляем прогресс в объекте контента
-      _educationalContent[contentIndex] = EducationalContent(
+      _educationalContent[contentIndex] = Education(
         id: content.id,
         images: content.images,
         title: content.title,
@@ -198,7 +164,7 @@ class EducationProvider with ChangeNotifier {
       }
 
       // Обновляем объект с нулевым прогрессом
-      _educationalContent[contentIndex] = EducationalContent(
+      _educationalContent[contentIndex] = Education(
         id: content.id,
         images: content.images,
         title: content.title,

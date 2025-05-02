@@ -20,7 +20,7 @@ class CulturalPlace {
   final String description;
   final GeoPoint location;
   final PlaceType type;
-  final String? imageUrl;
+  final String imageUrl;
   final List<String>? images;
 
   CulturalPlace({
@@ -28,12 +28,40 @@ class CulturalPlace {
     required this.description,
     required this.location,
     required this.type,
-    this.imageUrl,
+    required this.imageUrl,
     this.images,
   });
 
   // Преобразование координат в LatLng для flutter_map
   LatLng get latLng => location.toLatLng();
+
+  factory CulturalPlace.fromMap(Map<String, dynamic> json) {
+    return CulturalPlace(
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      location: GeoPoint(
+        latitude: json['latitude']?.toDouble() ?? 0.0,
+        longitude: json['longitude']?.toDouble() ?? 0.0,
+      ),
+      type: PlaceType.values.firstWhere(
+        (e) => e.name.toString() == json['type'],
+        orElse: () => PlaceType.museum,
+      ),
+      imageUrl: json['image_url'] ?? '',
+      images: (() {
+        final raw = json['images'];
+        if (raw is List) {
+          return raw.map((e) => e.toString()).toList();
+        } else if (raw is String && raw.contains(',')) {
+          return raw.split(',').map((e) => e.trim()).toList();
+        } else if (raw is String && raw.trim().isNotEmpty) {
+          return [raw.trim()];
+        } else {
+          return null;
+        }
+      })(),
+    );
+  }
 }
 
 enum PlaceType {

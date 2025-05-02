@@ -1,13 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chechen_tradition/data/event_items/mock_event_items.dart';
-import 'package:chechen_tradition/data/places/mock_places.dart';
-import 'package:chechen_tradition/data/traditions/mock_traditions.dart';
 import 'package:chechen_tradition/features/main/home/models/event_item.dart';
+import 'package:chechen_tradition/features/main/search/ui/search_screen.dart';
 import 'package:chechen_tradition/features/main/settings/ui/settings_screen.dart';
-import 'package:chechen_tradition/features/main/search/ui/search_page.dart';
-import 'package:chechen_tradition/features/places/ui/place/place_detail_screen.dart';
 import 'package:chechen_tradition/features/places/ui/place/places_list_screen.dart';
 import 'package:chechen_tradition/features/places/models/culture_place.dart';
-import 'package:chechen_tradition/features/traditions/ui/tradition_detail_screen.dart';
 import 'package:chechen_tradition/features/traditions/ui/traditions_list_screen.dart';
 import 'package:chechen_tradition/features/traditions/models/tradition.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const SearchPage(),
+                              builder: (context) => SearchScreen(),
                             ),
                           );
                         },
@@ -287,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             trailing:
                                 const Icon(Icons.arrow_forward_ios, size: 16),
                             onTap: () {
-                              _navigateToRecommendation(index, context);
+                              // _navigateToRecommendation(index, context);
                             },
                           ),
                         );
@@ -322,28 +319,20 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  event.color,
-                  event.color.withOpacity(0.7),
-                ],
-              ),
             ),
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: Opacity(
-                    opacity: 0.4,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        image: DecorationImage(
-                          image: AssetImage(event.imageUrl),
-                          fit: BoxFit.cover,
-                        ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: CachedNetworkImage(
+                      imageUrl: event.imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
                       ),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
                     ),
                   ),
                 ),
@@ -360,7 +349,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
+                              color:
+                                  Colors.white.withAlpha((0.9 * 255).toInt()),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -385,32 +375,45 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       const Spacer(),
-                      Text(
-                        event.title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          shadows: [
-                            Shadow(
-                              blurRadius: 3.0,
-                              color: Colors.black45,
-                              offset: Offset(1.0, 1.0),
-                            ),
-                          ],
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        event.description,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withOpacity(0.9),
-                          shadows: const [
-                            Shadow(
-                              blurRadius: 2.0,
-                              color: Colors.black38,
-                              offset: Offset(1.0, 1.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              event.title,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                    blurRadius: 3.0,
+                                    color: Colors.black45,
+                                    offset: Offset(1.0, 1.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              event.description,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color:
+                                    Colors.white.withAlpha((0.9 * 255).toInt()),
+                                shadows: const [
+                                  Shadow(
+                                    blurRadius: 2.0,
+                                    color: Colors.black38,
+                                    offset: Offset(1.0, 1.0),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -473,38 +476,38 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Метод для навигации по рекомендациям
-  void _navigateToRecommendation(int index, BuildContext context) {
-    switch (index) {
-      case 0: // Мечеть "Сердце Чечни"
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlaceDetailScreen(
-              place: mockPlaces[0],
-            ),
-          ),
-        );
-      case 1: // Национальный музей
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlaceDetailScreen(
-              place: mockPlaces[1],
-            ),
-          ),
-        );
-        break;
-      case 2: // Чеченский национальный костюм
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TraditionDetailScreen(
-              tradition: mockTraditions[0],
-            ),
-          ),
-        );
+  // void _navigateToRecommendation(int index, BuildContext context) {
+  //   switch (index) {
+  //     case 0: // Мечеть "Сердце Чечни"
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => PlaceDetailScreen(
+  //             place: mockPlaces[0],
+  //           ),
+  //         ),
+  //       );
+  //     case 1: // Национальный музей
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => PlaceDetailScreen(
+  //             place: mockPlaces[1],
+  //           ),
+  //         ),
+  //       );
+  //       break;
+  //     case 2: // Чеченский национальный костюм
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => TraditionDetailScreen(
+  //             tradition: mockTraditions[0],
+  //           ),
+  //         ),
+  //       );
 
-        break;
-    }
-  }
+  //       break;
+  //   }
+  // }
 }

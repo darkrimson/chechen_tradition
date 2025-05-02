@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:chechen_tradition/data/places/mock_places.dart';
 import 'package:chechen_tradition/features/places/models/culture_place.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PlacesProvider with ChangeNotifier {
   List<CulturalPlace> _places = [];
@@ -35,12 +35,20 @@ class PlacesProvider with ChangeNotifier {
 
   // Инициализация данных
   Future<void> _initPlaces() async {
-    // Загрузка мок-данных
-    _places = mockPlaces;
+    try {
+      final response =
+          await Supabase.instance.client.from('places').select('*');
 
-    // Загрузка избранного из SharedPreferences
+      final data = response as List<dynamic>;
+      print('Supabase raw data: $data');
+
+      _places = data.map((item) => CulturalPlace.fromMap(item)).toList();
+    } catch (e) {
+      debugPrint('Ошибка загрузки мест из Supabase: $e');
+      // fallback на моки
+    }
+
     await _loadFavorites();
-
     notifyListeners();
   }
 

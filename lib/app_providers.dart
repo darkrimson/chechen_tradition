@@ -1,3 +1,4 @@
+import 'package:chechen_tradition/features/main/search/provider/search_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -5,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:chechen_tradition/features/traditions/provider/tradition_provider.dart';
 import 'package:chechen_tradition/features/education/provider/education_provider.dart';
 import 'package:chechen_tradition/features/places/provider/places_provider.dart';
-import 'package:chechen_tradition/features/main/search/services/search_provider.dart';
 import 'package:chechen_tradition/features/main/settings/provider/settings_provider.dart';
 
 /// Класс для организации всех провайдеров приложения

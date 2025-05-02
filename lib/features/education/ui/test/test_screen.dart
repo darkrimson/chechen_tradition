@@ -1,8 +1,9 @@
+import 'package:chechen_tradition/features/education/models/question.dart';
 import 'package:flutter/material.dart';
 import '../../models/education.dart';
 
 class TestScreen extends StatefulWidget {
-  final EducationalContent content;
+  final Education content;
 
   const TestScreen({
     super.key,

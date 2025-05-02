@@ -130,6 +130,8 @@ class TraditionsListScreen extends StatelessWidget {
                   itemCount: filteredTraditions.length,
                   itemBuilder: (context, index) {
                     final tradition = filteredTraditions[index];
+                    final isFavorite = provider.isFavorite(tradition.id);
+
                     return Card(
                       margin: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
@@ -176,7 +178,7 @@ class TraditionsListScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      tradition.title,
+                                      tradition.name,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
@@ -212,7 +214,7 @@ class TraditionsListScreen extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                    if (tradition.isLiked) ...[
+                                    if (isFavorite) ...[
                                       const SizedBox(height: 8),
                                       Row(
                                         children: [

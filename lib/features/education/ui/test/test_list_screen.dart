@@ -3,7 +3,7 @@ import '../../models/education.dart';
 import 'test_screen.dart';
 
 class TestListScreen extends StatelessWidget {
-  final List<EducationalContent> educationalContent;
+  final List<Education> educationalContent;
 
   const TestListScreen({
     Key? key,
@@ -25,7 +25,7 @@ class TestListScreen extends StatelessWidget {
     );
   }
 
-  void _openTest(BuildContext context, EducationalContent content) {
+  void _openTest(BuildContext context, Education content) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -36,7 +36,7 @@ class TestListScreen extends StatelessWidget {
 }
 
 class TestCard extends StatelessWidget {
-  final EducationalContent content;
+  final Education content;
   final VoidCallback onTap;
 
   const TestCard({

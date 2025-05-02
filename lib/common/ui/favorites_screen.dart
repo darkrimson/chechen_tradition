@@ -275,7 +275,7 @@ class FavoritesScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tradition.title,
+                      tradition.name,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -311,26 +311,24 @@ class FavoritesScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (tradition.isLiked) ...[
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.favorite,
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'В избранном',
+                          style: TextStyle(
+                            fontSize: 12,
                             color: Colors.red,
-                            size: 16,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'В избранном',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

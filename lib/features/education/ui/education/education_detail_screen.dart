@@ -4,19 +4,19 @@ import 'package:carousel_slider/carousel_slider.dart';
 import '../../models/education.dart';
 import 'package:chechen_tradition/features/education/ui/test/test_screen.dart';
 
-class ContentDetailScreen extends StatefulWidget {
-  final EducationalContent content;
+class EducationDetailScreen extends StatefulWidget {
+  final Education content;
 
-  const ContentDetailScreen({
+  const EducationDetailScreen({
     super.key,
     required this.content,
   });
 
   @override
-  State<ContentDetailScreen> createState() => _ContentDetailScreenState();
+  State<EducationDetailScreen> createState() => _EducationDetailScreenState();
 }
 
-class _ContentDetailScreenState extends State<ContentDetailScreen> {
+class _EducationDetailScreenState extends State<EducationDetailScreen> {
   int _currentImageIndex = 0;
 
   @override
@@ -70,7 +70,7 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    widget.content.content!,
+                    widget.content.content,
                     style: const TextStyle(
                       fontSize: 16,
                       height: 1.6,
@@ -326,6 +326,7 @@ class _ContentDetailScreenState extends State<ContentDetailScreen> {
                           shape: BoxShape.circle,
                           color: currentFullScreenIndex == entry.key
                               ? Colors.white
+                              // ignore: deprecated_member_use
                               : Colors.white.withOpacity(0.4),
                         ),
                       );

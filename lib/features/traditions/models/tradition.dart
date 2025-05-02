@@ -2,22 +2,34 @@ import 'package:flutter/material.dart';
 
 class Tradition {
   final String id;
-  final String title;
+  final String name;
   final String description;
   final String content;
   final String imageUrl;
   final TraditionCategory category;
-  bool isLiked;
 
   Tradition({
     required this.id,
-    required this.title,
+    required this.name,
     required this.description,
     required this.content,
     required this.imageUrl,
     required this.category,
-    this.isLiked = false,
   });
+
+  factory Tradition.fromMap(Map<String, dynamic> json) {
+    return Tradition(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String,
+      content: json['content'] as String,
+      imageUrl: json['image_url'] as String,
+      category: TraditionCategory.values.firstWhere(
+        (e) => e.name.toString() == json['category'],
+        orElse: () => TraditionCategory.clothing,
+      ),
+    );
+  }
 }
 
 enum TraditionCategory {

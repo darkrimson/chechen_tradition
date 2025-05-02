@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chechen_tradition/data/education/mock_education.dart';
+import 'package:chechen_tradition/features/education/provider/education_provider.dart';
 import 'package:chechen_tradition/features/education/ui/education/education_detail_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/education.dart';
 import '../test/test_list_screen.dart';
 
@@ -30,6 +31,9 @@ class _EducationScreenState extends State<EducationScreen>
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<EducationProvider>(context);
+    final educationalContent = provider.educationalContent;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Обучение'),
@@ -46,19 +50,19 @@ class _EducationScreenState extends State<EducationScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildMaterialsList(),
-          TestListScreen(educationalContent: mockEducationalContent),
+          _buildMaterialsList(educationalContent),
+          TestListScreen(educationalContent: educationalContent),
         ],
       ),
     );
   }
 
-  Widget _buildMaterialsList() {
+  Widget _buildMaterialsList(List<Education> contentList) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: mockEducationalContent.length,
+      itemCount: contentList.length,
       itemBuilder: (context, index) {
-        final content = mockEducationalContent[index];
+        final content = contentList[index];
         return ContentCard(
           content: content,
           onTap: () => _openContent(content),
@@ -67,18 +71,18 @@ class _EducationScreenState extends State<EducationScreen>
     );
   }
 
-  void _openContent(EducationalContent content) {
+  void _openContent(Education content) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ContentDetailScreen(content: content),
+        builder: (context) => EducationDetailScreen(content: content),
       ),
     );
   }
 }
 
 class ContentCard extends StatelessWidget {
-  final EducationalContent content;
+  final Education content;
   final VoidCallback onTap;
 
   const ContentCard({
