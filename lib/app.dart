@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     // Устанавливаем цвет шторки уведомлений
@@ -23,6 +22,7 @@ class MyApp extends StatelessWidget {
     );
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Культурное наследие',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -33,24 +33,6 @@ class MyApp extends StatelessWidget {
           background: Colors.white,
           surface: Colors.white,
           brightness: Brightness.light,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF8B0000),
-          foregroundColor: Colors.white,
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: Color(0xFF8B0000),
-            statusBarIconBrightness: Brightness.light,
-            statusBarBrightness: Brightness.dark,
-          ),
-        ),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF8B0000),
-          primary: const Color(0xFF8B0000),
-          secondary: const Color(0xFF006400),
-          brightness: Brightness.dark,
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF8B0000),
@@ -110,7 +92,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.map),
-            label: 'Карта',
+            label: 'Места',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.celebration),

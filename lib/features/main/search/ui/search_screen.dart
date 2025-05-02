@@ -107,32 +107,87 @@ class _SearchResultItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: CachedNetworkImage(
-          imageUrl: item.imageUrl,
-          width: 56,
-          height: 56,
-          fit: BoxFit.cover,
-          placeholder: (context, url) => Container(
-            color: Colors.grey.shade300,
-            child: const Icon(Icons.image),
-          ),
-          errorWidget: (context, url, error) => Container(
-            color: Colors.grey.shade300,
-            child: const Icon(Icons.error),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: () => _navigateToDetail(context, item),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: CachedNetworkImage(
+                  imageUrl: item.imageUrl,
+                  width: 100,
+                  height: 120,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    width: 100,
+                    height: 120,
+                    color: Colors.grey.shade300,
+                    child: const Icon(Icons.image, size: 40),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    width: 100,
+                    height: 120,
+                    color: Colors.grey.shade300,
+                    child: const Icon(Icons.error, size: 40),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      item.subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: getCategoryColorForSearch(item.type)
+                            .withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        item.type.label,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: getCategoryColorForSearch(item.type),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
-      title: Text(item.title),
-      subtitle: Text(
-        item.subtitle,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      ),
-      trailing: _buildTypeIcon(item.type),
-      onTap: () => _navigateToDetail(context, item),
     );
   }
 

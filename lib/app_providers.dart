@@ -8,7 +8,6 @@ import 'package:chechen_tradition/features/education/provider/education_provider
 import 'package:chechen_tradition/features/places/provider/places_provider.dart';
 import 'package:chechen_tradition/features/main/settings/provider/settings_provider.dart';
 
-/// Класс для организации всех провайдеров приложения
 class AppProviders extends StatelessWidget {
   final Widget child;
 

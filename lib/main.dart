@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
+  //инициализация виджетов
   WidgetsFlutterBinding.ensureInitialized();
 
+  //инициализация Supabase
   await Supabase.initialize(
     url: 'https://ajdzbyooxgkpfcnlxnnq.supabase.co',
     anonKey:
@@ -13,7 +15,7 @@ Future<void> main() async {
   );
 
   runApp(
-    // Оборачиваем приложение в AppProviders для доступа к провайдерам
+    // оборачиваем приложение в AppProviders для доступа к провайдерам
     const AppProviders(
       child: MyApp(),
     ),
